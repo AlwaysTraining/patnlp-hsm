@@ -1,0 +1,105 @@
+/* Various colors */
+.primary-1 { background-color: #FFF479 }
+.primary-2 { background-color: #BDB774 }
+.primary-3 { background-color: #A39926 }
+.primary-4 { background-color: #FFF79B }
+.primary-5 { background-color: #FFF9B6 }
+
+.secondary-a-1 { background-color: #66D6A9 }
+.secondary-a-2 { background-color: #619F86 }
+.secondary-a-3 { background-color: #20895F }
+.secondary-a-4 { background-color: #8FEBC6 }
+.secondary-a-5 { background-color: #A8EBD0 }
+
+.secondary-b-1 { background-color: #FFA179 }
+.secondary-b-2 { background-color: #BD8A74 }
+.secondary-b-3 { background-color: #A34B26 }
+.secondary-b-4 { background-color: #FFB99B }
+.secondary-b-5 { background-color: #FFCCB6 }
+
+.complement-1 { background-color: #9D6FD6 }
+.complement-2 { background-color: #7F669F }
+.complement-3 { background-color: #502389 }
+.complement-4 { background-color: #BC97EB }
+.complement-5 { background-color: #C9AEEB }
+
+.ts-box {
+    border:2px solid #9D6FD6 ;
+    -webkit-border-top-left-radius:6px;
+    -webkit-border-top-right-radius:6px;
+    -moz-border-radius-topleft:6px;
+    -moz-border-radius-topright:6px;
+    border-top-left-radius:6px;
+    border-top-right-radius:6px;
+    width:100%;
+    font-size:12pt;
+    /* IE10 Consumer Preview */ 
+    background-image: -ms-radial-gradient(left top, circle farthest-side, #FFFFFF 0%, #A5B1B8 100%);
+    /* Mozilla Firefox */ 
+    background-image: -moz-radial-gradient(left top, circle farthest-side, #FFFFFF 0%, #A5B1B8 100%);
+    /* Opera */ 
+    background-image: -o-radial-gradient(left top, circle farthest-side, #FFFFFF 0%, #A5B1B8 100%);
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(radial, left top, 0, left top, 970, color-stop(0, #FFFFFF), color-stop(1, #A5B1B8));
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-radial-gradient(left top, circle farthest-side, #FFFFFF 0%, #A5B1B8 100%);
+    /* W3C Markup, IE10 Release Preview */ 
+    background-image: radial-gradient(circle farthest-side at left top, #FFFFFF 0%, #A5B1B8 100%);
+}
+
+.ts-box h2 {
+    padding:4px;
+    color:#fff;
+    margin:0;
+    background-color:#9D6FD6;
+    font-size:12pt;   
+    font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+.ts-box .inner {
+    padding:8px;
+}
+
+.ts-box2 {
+    border:2px solid #20895F ;
+    -webkit-border-top-left-radius:6px;
+    -webkit-border-top-right-radius:6px;
+    -moz-border-radius-topleft:6px;
+    -moz-border-radius-topright:6px;
+    border-top-left-radius:6px;
+    border-top-right-radius:6px;
+    width:100%;
+    font-size:12pt;
+    /* IE10 Consumer Preview */ 
+    background-image: -ms-radial-gradient(left top, circle farthest-side, #FFFFFF 0%, #A5B1B8 100%);
+    /* Mozilla Firefox */ 
+    background-image: -moz-radial-gradient(left top, circle farthest-side, #FFFFFF 0%, #A5B1B8 100%);
+    /* Opera */ 
+    background-image: -o-radial-gradient(left top, circle farthest-side, #FFFFFF 0%, #A5B1B8 100%);
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(radial, left top, 0, left top, 970, color-stop(0, #FFFFFF), color-stop(1, #A5B1B8));
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-radial-gradient(left top, circle farthest-side, #FFFFFF 0%, #A5B1B8 100%);
+    /* W3C Markup, IE10 Release Preview */ 
+    background-image: radial-gradient(circle farthest-side at left top, #FFFFFF 0%, #A5B1B8 100%);
+    position:relative;
+}
+
+.ts-box2 h2 {
+    padding:4px;
+    color:#fff;
+    margin:0;
+    background-color:#20895F;
+    font-size:12pt;
+    font-family:"Comic Sans MS", cursive, sans-serif;
+}
+
+.ts-box2 .inner {
+    padding:8px;
+    height:25em;
+    overflow:auto;
+}
+
+body {
+    font-family: Verdana, Geneva, sans-serif;
+}

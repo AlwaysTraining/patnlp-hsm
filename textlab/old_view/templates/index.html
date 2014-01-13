@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8" />
+        <title>textseg</title>
+        <!-- stylesheets -->
+        <link rel="stylesheet" type="text/css" href="css/layout-default-latest.css">
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <link rel="stylesheet" type="text/css" href="css/clusters.css">
+        
+        <!-- scripts -->
+        <script src="javascript/jquery-1.9.1.js"></script>
+        <script src="javascript/jquery-ui-1.10.3.custom.min.js"></script>
+        <script src="javascript/jquery.layout-latest.min.js"></script>
+        <script src="javascript/jquery.jstree.js"></script>
+        <script src="javascript/index.js"></script>
+    </head>
+<body>
+
+<div class="ui-layout-west">
+    <div class="ts-box">
+        <h2>Segment selector</h2>
+        <div class="inner">
+        </div>
+    </div>
+    
+</div>
+<div class="ui-layout-center">
+    <div class="ts-box2">
+        <h2>Document view</h2>
+        <div class="inner">
+        	{% include "documentview.html" %}
+        </div>
+    </div>
+</div>
+
+</body>
+</html> 

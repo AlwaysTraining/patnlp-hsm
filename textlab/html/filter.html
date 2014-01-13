@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<title>Untitled</title>
+<script type="text/javascript" src="lib/d3.min.js"></script>
+<script type="text/javascript" src="lib/dojo/dojo/dojo.js" data-dojo-config="'parseOnLoad':true,'async':true,'packages':[{'name':'gridx','location':'../gridx'},{'name':'clipart','location':'../../clipart'},{'name':'maqettaSamples','location':'../../../samples'},{'name':'maqetta','location':'../../maqetta'},{'name':'shapes','location':'../../shapes'},{'name':'zazl','location':'../../zazl'},{'name':'widgets','location':'../../custom'}],'themeMap':[['Android','',['themes/android/android.css']],['BlackBerry','',['themes/blackberry/blackberry.css']],['iPad','',['themes/ipad/ipad.css']],['iPhone','',['themes/iphone/iphone.css']],['.*','',['themes/iphone/iphone.css']]],'mblThemeFiles':[],'mblLoadCompatPattern':''"></script>
+<script type="text/javascript">
+require([
+  "dijit/dijit",
+  "dojo/parser",
+  "maqetta/space",
+  "maqetta/AppStates",
+  "dijit/layout/AccordionContainer",
+  "dijit/layout/ContentPane",
+  "dijit/layout/BorderContainer",
+  "dijit/form/TextBox",
+  "dijit/form/ComboBox",
+  "dijit/form/Button",
+  "dijit/form/CheckBox",
+  "dijit/form/RadioButton",
+  "dijit/layout/TabContainer",
+  "dijit/popup",
+  "dojo/data/ItemFileReadStore",
+  "shapes/Rectangle"
+]);
+</script>
+<style>@import "themes/claro/document.css";@import "themes/claro/claro.css";@import "app.css";
+</style>
+<script type="text/javascript" src="app.js"></script>
+</head>
+<body data-maq-flow-layout="true" data-maq-comptype="desktop" class="claro" data-maq-ws="collapse" data-maq-appstates="{}" id="myapp">
+ <div data-dojo-type="dijit/layout/BorderContainer" design="sidebar" persist="false" gutters="true" style="min-width: 1em; min-height: 1px; z-index: 0; height: 100%; width: 100%;">
+   <div data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="left" splitter="true" maxSize="Infinity" doLayout="false" style="width:333px;">
+     <div>
+<span data-dojo-type="dijit/layout/AccordionContainer" style="min-width: 1em; min-height: 1em; width: 100%; height: 255px;">
+<div data-dojo-type="dijit/layout/ContentPane" title="Basic" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" selected="true" closable="false" doLayout="false">
+        <table border="0" style="border-collapse: collapse; table-layout: auto; width: 100%; height: auto;">
+          <colgroup>
+            <col></col>
+            <col></col>
+          </colgroup>
+          <tbody>
+            <tr>
+              <td>Segment name</td>
+              <td>
+                <input type="text" data-dojo-type="dijit/form/TextBox" id="segment_name" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+              </td>
+            </tr>
+            <tr>
+              <td>Regex</td>
+              <td>
+                <input type="text" data-dojo-type="dijit/form/TextBox" id="segment_value_regex" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+              </td>
+            </tr>
+            <tr>
+              <td>Neg. regex</td>
+              <td>
+                <input type="text" data-dojo-type="dijit/form/TextBox" id="segment_neg_regex" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+              </td>
+            </tr>
+            <tr>
+              <td>Creates segment</td>
+              <td>
+               <input type="checkbox" data-dojo-type="dijit/form/CheckBox" id="creates_segment" intermediateChanges="false" iconClass="dijitNoIcon"></input>
+             </td>
+            </tr>
+            <tr>
+              <td>Output name</td>
+              <td>
+                <input type="text" data-dojo-type="dijit/form/TextBox" id="output_name" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div data-dojo-type="dijit/layout/ContentPane" title="Document filter" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" selected="true" closable="false" doLayout="false">
+        <table border="0" style="border-collapse: collapse; table-layout: auto; width: 100%; height: auto;">
+          <colgroup>
+            <col></col>
+            <col></col>
+          </colgroup>
+          <tbody>
+            <tr>
+              <td>Name prefix</td>
+              <td>
+                <input type="text" data-dojo-type="dijit/form/TextBox" id="document_prefix" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+              </td>
+            </tr>
+            <tr>
+              <td>Regex</td>
+              <td>
+               <input type="text" data-dojo-type="dijit/form/TextBox" id="document_regex" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+             </td>
+            </tr>
+            <tr>
+              <td>Neg. regex</td>
+              <td>
+               <input type="text" data-dojo-type="dijit/form/TextBox" id="document_neg_regex" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+             </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div data-dojo-type="dijit/layout/ContentPane" title="Container" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" doLayout="true" closable="false">
+       <table border="0" style="border-collapse: collapse; table-layout: fixed; width: 100%; height: auto;">
+         <colgroup>
+           <col></col>
+           <col></col>
+         </colgroup>
+         <tbody>
+           <tr>
+             <td>
+               Segment name</td>
+             <td>
+               <input type="text" data-dojo-type="dijit/form/TextBox" id="container_name" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+             </td>
+           </tr>
+           <tr>
+             <td>
+               Regex</td>
+             <td>
+               <input type="text" data-dojo-type="dijit/form/TextBox" id="container_value_regex" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+             </td>
+           </tr>
+           <tr>
+             <td>
+               Neg. regex</td>
+             <td>
+               <input type="text" data-dojo-type="dijit/form/TextBox" id="container_neg_regex" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+             </td>
+           </tr>
+           <tr>
+             <td>
+               Includes / is included</td>
+             <td>
+               <input type="checkbox" data-dojo-type="dijit/form/CheckBox" id="container_includes" intermediateChanges="false" iconClass="dijitNoIcon" checked="true"></input>
+             </td>
+           </tr>
+           <tr>
+             <td>
+               Keep source / container</td>
+             <td>
+               <input type="checkbox" data-dojo-type="dijit/form/CheckBox" id="container_keep_source" intermediateChanges="false" iconClass="dijitNoIcon" checked="true"></input>
+             </td>
+           </tr>
+         </tbody>
+       </table>
+     </div>
+      <div data-dojo-type="dijit/layout/ContentPane" title="Mixin" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" doLayout="true" closable="false">
+        <table border="0" style="border-collapse: collapse; table-layout: auto; width: 100%; height: auto;">
+          <colgroup>
+            <col></col>
+            <col></col>
+          </colgroup>
+          <tbody>
+            <tr>
+              <td>
+               Segment name</td>
+              <td>
+               <input type="text" data-dojo-type="dijit/form/TextBox" id="mixin_name" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+             </td>
+            </tr>
+            <tr>
+              <td>
+               Regex</td>
+              <td>
+               <input type="text" data-dojo-type="dijit/form/TextBox" id="mixin_value_regex" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+             </td>
+            </tr>
+            <tr>
+              <td>
+               Neg. regex</td>
+              <td>
+               <input type="text" data-dojo-type="dijit/form/TextBox" id="mixin_neg_regex" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" selectOnClick="false" style="width: auto;"></input>
+             </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </span>
+     </div>
+     <div>
+     </div>
+     <div>
+      <select data-dojo-type="dijit/form/ComboBox" id="filter_name" value="" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" invalidMessage="$_unset_$" pageSize="Infinity" searchDelay="200" style="width: 100%;" onchange="load_current_filter()">
+      </select>
+    </div>
+     <div>
+       <span>
+ <span>
+  <input type="button" data-dojo-type="dijit/form/Button" id="new_filter" name="basic_segment_name" intermediateChanges="false" label="New" iconClass="dijitNoIcon" onclick="new_filter()"></input>
+</span>
+ <input type="button" data-dojo-type="dijit/form/Button" id="save_filter" intermediateChanges="false" label="Save" iconClass="dijitNoIcon" onclick="save_filter()"></input>
+</span><span>
+<input type="button" data-dojo-type="dijit/form/Button" id="rename_filter" intermediateChanges="false" label="Rename" iconClass="dijitNoIcon"></input>
+</span><span>
+<input type="button" data-dojo-type="dijit/form/Button" id="remove_filter" intermediateChanges="false" label="Remove" iconClass="dijitNoIcon"></input>
+</span>
+     <span>
+      <input type="button" data-dojo-type="dijit/form/Button" id="preview_sample" intermediateChanges="false" label="Preview sample" iconClass="dijitNoIcon" onclick="preview_sample()"></input>
+    </span><span>
+<input type="button" data-dojo-type="dijit/form/Button" id="apply_filter" intermediateChanges="false" label="Apply" iconClass="dijitNoIcon" onclick="apply_filter()"></input>
+</span></div>
+   </div>
+   <div data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="right" splitter="true" maxSize="Infinity" doLayout="false" style="width: 217px; left: 998px; top: 5px;">
+  </div>
+   <div data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="center" splitter="false" maxSize="Infinity" doLayout="false">
+<span data-dojo-type="dijit/layout/TabContainer" style="min-width: 1em; min-height: 1em; width: 100%; height: 100%;" controllerWidget="dijit.layout.TabController">
+<div data-dojo-type="dijit/layout/ContentPane" id="source_html" title="Source" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" selected="true" closable="false"></div>
+    <div data-dojo-type="dijit/layout/ContentPane" id="container_html" title="Container" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" selected="true" closable="false"></div>
+    <div data-dojo-type="dijit/layout/ContentPane" id="mixin_html" title="Mixin" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" doLayout="true" selected="true" closable="false"></div>
+    <div data-dojo-type="dijit/layout/ContentPane" id="output_html" title="Output" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" doLayout="true" selected="true" closable="false"></div>
+  </span>
+   </div>
+ </div>
+</body>
+</html>
