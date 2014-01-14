@@ -77,9 +77,12 @@ class MongoSegmentStorage(SegmentStorage):
     
     def save(self, segments):
         '''Save given segments to the storage.'''
-        for segment in segments:
-            assert isinstance(segment, Segment)
-        self._segments.insert([Segment.to_dict(segment) for segment in segments])
+        if len(segments) > 0:
+            for segment in segments:
+                if not isinstance(segment, Segment):
+                    print type(segment), Segment
+                    raise AssertionError(unicode(segment) + u' is not a segment!')
+            self._segments.insert([Segment.to_dict(segment) for segment in segments])
     
     def delete(self, **kwargs):
         '''Delete segments from the storage.
