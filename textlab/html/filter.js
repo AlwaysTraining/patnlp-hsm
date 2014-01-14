@@ -177,6 +177,9 @@ function save_filter() {
 	});
 }
 
+/**
+ * View a preview of current filter.
+ */
 function preview_sample() {
 	var name = dijit.byId('filter_name').get('value');
 	dojo.xhrGet({
@@ -195,6 +198,9 @@ function preview_sample() {
 	});
 }
 
+/**
+ * Apply current filter to full dataset.
+ */
 function apply_filter() {
 	var name = dijit.byId('filter_name').get('value');
 	dojo.xhrGet({
@@ -208,3 +214,88 @@ function apply_filter() {
 		}
 	});
 }
+
+/**
+ * Update dependency graph of filter nodes.
+ */
+function update_graph() {
+    var width = 500;
+    var height = 500;
+
+    var force = d3.layout.force()
+        .linkDistance(256)
+        .size([width, height]);
+    
+    var drag = force.drag().on("dragstart", dragstart);
+
+    dojo.empty('graph_div');
+    var svg = d3.select('#graph_div').append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+    d3.json('filter/graph', function (error, graph) {
+        force
+            .nodes(graph.nodes)
+            .links(graph.links)
+            .start();
+
+        var link = svg.selectAll(".link")
+            .data(graph.links)
+            .enter().append("line")
+            .attr("class", "link");
+
+        var node = svg.selectAll(".node")
+            .data(graph.nodes)
+            .enter().append("g")
+            .attr("class", "node")
+            .attr('r', 64)
+            .call(drag);
+
+        var images = new Array();
+        images[1] = 'img/filter_filter.png';
+        images[2] = 'img/filter_input.png';
+        images[3] = 'img/filter_output.png';
+
+        node.append("image")
+            .attr("xlink:href", function(d) { return images[d.group] })
+            .attr("x", -32)
+            .attr("y", -32)
+            .attr("width", 64)
+            .attr("height", 64);
+
+        node.append("text")
+            .attr("dx", '2em')
+            .attr("dy", ".35em")
+            .text(function (d) {
+                return d.name
+            });
+
+        force.on("tick", function () {
+            link.attr("x1", function (d) {
+                return d.source.x;
+            })
+                .attr("y1", function (d) {
+                    return d.source.y;
+                })
+                .attr("x2", function (d) {
+                    return d.target.x;
+                })
+                .attr("y2", function (d) {
+                    return d.target.y;
+                });
+
+            node.attr("transform", function (d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            });
+        });
+    });
+}
+
+function dblclick(d) {
+  d3.select(this).classed("fixed", d.fixed = false);
+}
+
+function dragstart(d) {
+  d3.select(this).classed("fixed", d.fixed = true);
+}
+

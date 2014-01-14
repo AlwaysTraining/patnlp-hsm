@@ -45,10 +45,12 @@ def emphasize_html(segment, docstorage, context_size):
     left = doc.text[start:segment.start]
     right = doc.text[segment.end:end]
     middle = doc.text[segment.start:segment.end]
-    return u''.join([left, '<b>', middle, '</b>', right])
+    return (left, middle, right)
 
 def segments_html(segs, docstorage, context_size=30):
     htmls = [emphasize_html(seg, docstorage, context_size) for seg in segs]
+    htmls.sort(key=lambda (left, middle, right): (middle, left[:-5:-1]))
+    htmls = [left + u'<b>' + middle + '</b>' + right for left, middle, right in htmls]
     return u'<br/>'.join(htmls)
 
 def head(iterable, n):
@@ -135,5 +137,27 @@ class FilterServer(object):
             return json.dumps({'result': 'FAIL', 'error': str(e)})
 
     @cherrypy.expose
-    def filter_dependency_graph(self):
-        pass
+    @mimetype('application/json')
+    def graph(self):
+        names = []
+        nodes = []
+        links = []
+        for name in self._setstorage.list(NAME_PREFIX):
+            settings = self._setstorage.load(name)
+            filter_name = decode_name(name)
+            output_name = settings['output_name']
+            segment_name = settings['segment_name']
+            if filter_name not in names:
+                nodes.append({'name': filter_name, 'group': 1})
+                names.append(filter_name)
+            if segment_name not in names:
+                nodes.append({'name': segment_name, 'group': 2})
+                names.append(segment_name)
+            if output_name not in names:
+                nodes.append({'name': output_name, 'group': 3})
+                names.append(output_name)
+            
+            links.append({'source': names.index(segment_name), 'target': names.index(filter_name), 'value': 1})
+            links.append({'source': names.index(filter_name), 'target': names.index(output_name), 'value': 1})
+            
+        return json.dumps({'nodes': list(nodes), 'links': list(links)})

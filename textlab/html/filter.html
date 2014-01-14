@@ -26,9 +26,9 @@ require([
   "shapes/Rectangle"
 ]);
 </script>
-<style>@import "themes/claro/document.css";@import "themes/claro/claro.css";@import "app.css";
+<style>@import "themes/claro/document.css";@import "themes/claro/claro.css";@import "filter.css";
 </style>
-<script type="text/javascript" src="app.js"></script>
+<script type="text/javascript" src="filter.js"></script>
 </head>
 <body data-maq-flow-layout="true" data-maq-comptype="desktop" class="claro" data-maq-ws="collapse" data-maq-appstates="{}" id="myapp">
  <div data-dojo-type="dijit/layout/BorderContainer" design="sidebar" persist="false" gutters="true" style="min-width: 1em; min-height: 1px; z-index: 0; height: 100%; width: 100%;">
@@ -198,14 +198,15 @@ require([
 </span><span>
 <input type="button" data-dojo-type="dijit/form/Button" id="remove_filter" intermediateChanges="false" label="Remove" iconClass="dijitNoIcon"></input>
 </span>
-     <span>
-      <input type="button" data-dojo-type="dijit/form/Button" id="preview_sample" intermediateChanges="false" label="Preview sample" iconClass="dijitNoIcon" onclick="preview_sample()"></input>
-    </span><span>
+<span><input type="button" data-dojo-type="dijit/form/Button" id="update_graph" intermediateChanges="false" label="Update graph" iconClass="dijitNoIcon" onclick="update_graph()"></input></span>
+     <span><input type="button" data-dojo-type="dijit/form/Button" id="preview_sample" intermediateChanges="false" label="Preview sample" iconClass="dijitNoIcon" onclick="preview_sample()"></input></span>
+<span>
 <input type="button" data-dojo-type="dijit/form/Button" id="apply_filter" intermediateChanges="false" label="Apply" iconClass="dijitNoIcon" onclick="apply_filter()"></input>
 </span></div>
    </div>
-   <div data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="right" splitter="true" maxSize="Infinity" doLayout="false" style="width: 217px; left: 998px; top: 5px;">
-  </div>
+	<div id="graph_div" data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="right" splitter="true" maxSize="Infinity" doLayout="false" style="width: 217px; left: 998px; top: 5px;">
+		
+	</div>
    <div data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="center" splitter="false" maxSize="Infinity" doLayout="false">
 <span data-dojo-type="dijit/layout/TabContainer" style="min-width: 1em; min-height: 1em; width: 100%; height: 100%;" controllerWidget="dijit.layout.TabController">
 <div data-dojo-type="dijit/layout/ContentPane" id="source_html" title="Source" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" selected="true" closable="false"></div>
