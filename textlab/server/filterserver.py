@@ -110,7 +110,7 @@ class FilterServer(object):
         try:
             settings = self._setstorage.load(encode_name(name))
             filt = Filter(**settings)
-            limit = 50
+            limit = 150
             context_size = 50
             
             output_segs = head(filt.filter(self._segstorage, self._docstorage), limit)

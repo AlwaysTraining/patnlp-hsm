@@ -44,6 +44,7 @@ class SegmentStorage(object):
         if doc_prefix is not None:
             assert isinstance(doc_prefix, unicode)
         if value_regex is not None:
+            
             assert isinstance(value_regex, unicode)
         if neg_regex is not None:
             assert isinstance(neg_regex, unicode)

@@ -99,11 +99,14 @@ def create_ne_segments(values, starts, ends, document, segstorage):
     segment = None
     for value, start, end in izip(values, starts, ends):
         if value.startswith('B-'):
+            ne_value = value[2:]
             if segment is not None:
                 segments.append(segment)
-            segment = Segment(u'ne_type', value[2:], document, start, end)
+                segment = Segment(u'ne_type', ne_value, document, start, end)
+            segment = Segment(u'ne_type', ne_value, document, start, end)
+        elif value.startswith('I-'):
+            segment.end = end 
         elif value.startswith('O') and segment is not None:
-            segment.end = end
             segments.append(segment)
             segment = None
     if segment is not None:
@@ -158,7 +161,7 @@ class CnllImporter(object):
         # create document
         doc_text = u' '.join(lists.word)
         document = Document(self._name_prefix + unicode(self._doc_idx), doc_text)
-        #self._documentstorage.save(document)
+        self._documentstorage.save(document)
         self._doc_idx += 1
         
         # create segments
@@ -188,12 +191,12 @@ class CnllImporter(object):
             if line == '--':
                 self._end_of_document(sentences)
             line = f.readline()
-        self._end_of_sentence(lists)
-        self._end_of_document(lists)
+        self._end_of_sentence(sentences, lists)
+        self._end_of_document(sentences)
         
 if __name__ == '__main__':
-    documentstorage = MongoDocumentStorage('test_db')
-    segmentstorage = MongoSegmentStorage('test_db')
+    documentstorage = MongoDocumentStorage()
+    segmentstorage = MongoSegmentStorage()
     importer = CnllImporter(filename='/home/timo/estner/estner.cnll',
                     name_prefix=u'ner:',
                     documentstorage=documentstorage,
