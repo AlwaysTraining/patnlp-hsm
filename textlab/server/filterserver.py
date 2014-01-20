@@ -5,21 +5,23 @@ import json
 import re
 
 from util import mimetype
-from itertools import izip
 from pprint import pprint
 from textlab.tools.filter import Filter, FILTER_NAME
 
 NAME_PREFIX = u'filtertool:'
 
 def encode_name(name):
+    '''Function that encodes the settings with filtertool prefix.'''
     return NAME_PREFIX + name
 
 def decode_name(name):
+    '''Function that decodes the settings with filtertool prefix.'''
     if name.startswith(NAME_PREFIX):
         return name[len(NAME_PREFIX):]
     raise ValueError('Cannot decode encoded name ' + name)
 
 def convert_boolean(kwargs):
+    '''Convert Javascript 'true'/'false' boolean representation as required by Python.'''
     for key in kwargs:
         if key in Filter.BOOLEAN_KEYWORDS:
             value = kwargs[key]
@@ -30,6 +32,7 @@ def convert_boolean(kwargs):
     return kwargs
 
 def remove_missing(kwargs):
+    '''Remove missing values from kwargs so they could be given to a Filter instance.'''
     to_remove = set()
     for key in kwargs:
         if key not in Filter.BOOLEAN_KEYWORDS:
@@ -97,8 +100,12 @@ class FilterServer(object):
             return json.dumps({'result': 'FAIL', 'error': str(e)})
     
     @cherrypy.expose
-    def remove(self, filter_name):
-        pass
+    def remove(self, name):
+        try:
+            self._setstorage.delete(encode_name(name))
+            return json.dumps({'result': 'OK'})
+        except Exception, e:
+            return json.dumps({'result': 'FAIL', 'error': str(e)})
     
     @cherrypy.expose
     @mimetype('application/json')
@@ -116,9 +123,6 @@ class FilterServer(object):
         except Exception, e:
             return json.dumps({'result': 'FAIL', 'error': str(e)})
     
-    @cherrypy.expose
-    def rename_filter(self, old_name, new_name):
-        pass
     
     @cherrypy.expose
     def preview_sample(self, name):
@@ -128,12 +132,25 @@ class FilterServer(object):
             limit = 150
             context_size = 50
             
+            # preview basic
+            basic_segs = head(filt.filter_basic(self._segstorage, self._docstorage), limit)
+            basic = segments_html(basic_segs, self._docstorage, context_size)
+            
+            # preview container
+            container_segs = head(filt.filter_container(basic_segs, self._segstorage), limit)
+            container = segments_html(container_segs, self._docstorage, context_size)
+            
+            # preview mixin
+            mixin_segs = head(filt.filter_mixin(container_segs, self._segstorage), limit)
+            mixin = segments_html(mixin_segs, self._docstorage, context_size)
+            
+            # preview final output
             output_segs = head(filt.filter(self._segstorage, self._docstorage), limit)
             output = segments_html(output_segs, self._docstorage, context_size)
             
-            data = {'source': u'',
-                    'container': u'',
-                    'mixin': u'',
+            data = {'basic': basic,
+                    'container': container,
+                    'mixin': mixin,
                     'output': output}
             
             return json.dumps({'result': 'OK', 'data': data})

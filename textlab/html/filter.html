@@ -10,6 +10,7 @@
 require([
   "dijit/dijit",
   "dojo/parser",
+  "dojo/store/JsonRest",
   "maqetta/space",
   "maqetta/AppStates",
   "dijit/layout/AccordionContainer",
@@ -193,9 +194,7 @@ require([
 </span>
  <input type="button" data-dojo-type="dijit/form/Button" id="save_filter" intermediateChanges="false" label="Save" iconClass="dijitNoIcon" onclick="save_filter()"></input>
 </span><span>
-<input type="button" data-dojo-type="dijit/form/Button" id="rename_filter" intermediateChanges="false" label="Rename" iconClass="dijitNoIcon"></input>
-</span><span>
-<input type="button" data-dojo-type="dijit/form/Button" id="remove_filter" intermediateChanges="false" label="Remove" iconClass="dijitNoIcon"></input>
+<input type="button" data-dojo-type="dijit/form/Button" id="remove_filter" intermediateChanges="false" label="Remove" iconClass="dijitNoIcon" onclick="remove_current_filter()"></input>
 </span>
 <span><input type="button" data-dojo-type="dijit/form/Button" id="update_graph" intermediateChanges="false" label="Update graph" iconClass="dijitNoIcon" onclick="update_graph()"></input></span>
      <span><input type="button" data-dojo-type="dijit/form/Button" id="preview_sample" intermediateChanges="false" label="Preview sample" iconClass="dijitNoIcon" onclick="preview_sample()"></input></span>

@@ -17,29 +17,6 @@ require(["dojo/ready"], function(ready){
      });
 });
 
-
-/*
- * Get the Dojo store associated with filter name input.
- */
-function filtername_store() {
-	
-}
-
-	
-/*
- * Load filter names into filter name selector.
- */
-function load_filter_names() {
-	dojo.xhrGet({
-		url: "filter/available_filters",
-		load: function(result) {
-			//var store = new dojo.data.ItemFileReadStore({data: {identifier: 'filter_name', label: 'filter_name', items: result}});
-			//alert (store);
-			//dijit.byId('filter_name').store = store;
-		}
-	});
-}
-
 function get_methods(obj) {
   var result = [];
   for (var id in obj) {
@@ -194,6 +171,25 @@ function save_filter() {
 	});
 }
 
+/*
+ * Delete the currently selected filter.
+ */
+function remove_current_filter() {
+	var name = dijit.byId('filter_name').get('value');
+	dojo.xhrGet({
+		url: "filter/remove",
+		content: {'name': name},
+		load: function(result) {
+			result = JSON.parse(result);
+			if (result['result'] === 'FAIL') {
+				alert(result['error']);
+			} else {
+				alert('Removed!');
+			}
+		}
+	});
+}
+	
 /**
  * View a preview of current filter.
  */
@@ -208,7 +204,9 @@ function preview_sample() {
 				alert(result['error']);
 			} else {
 				result = result['data'];
-				dojo.byId('source_html').innerHTML = result['source'];
+				dojo.byId('source_html').innerHTML = result['basic'];
+				dojo.byId('container_html').innerHTML = result['container'];
+				dojo.byId('mixin_html').innerHTML = result['mixin'];
 				dojo.byId('output_html').innerHTML = result['output'];
 			}
 		}
