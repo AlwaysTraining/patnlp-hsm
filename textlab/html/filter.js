@@ -54,6 +54,11 @@ function empty_settings() {
 	settings['container_includes'] = true;
 	settings['container_keep_source'] = true;
 	
+	settings['splitter_left'] = '';
+	settings['splitter_regex'] = '';
+	settings['splitter_right'] = '';
+	settings['splitter_neg_regex'] = u'';
+	
 	settings['mixin_name'] = '';
 	settings['mixin_value_regex'] = '';
 	settings['mixin_neg_regex'] = '';
@@ -69,6 +74,7 @@ function string_settings() {
 	             'segment_name', 'segment_value_regex', 'segment_neg_regex', 'output_name',
 	             'document_prefix', 'document_regex', 'document_neg_regex',
 	             'container_name', 'container_value_regex', 'container_neg_regex',
+	             'splitter_left', 'splitter_regex', 'splitter_right', 'splitter_neg_regex',
 	             'mixin_name', 'mixin_value_regex', 'mixin_neg_regex']
 	return names;
 }
