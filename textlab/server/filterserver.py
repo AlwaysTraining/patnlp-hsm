@@ -2,11 +2,12 @@
 
 import cherrypy
 import json
+import re
 
 from util import mimetype
 from itertools import izip
+from pprint import pprint
 from textlab.tools.filter import Filter, FILTER_NAME
-
 
 NAME_PREFIX = u'filtertool:'
 
@@ -70,8 +71,20 @@ class FilterServer(object):
 
     @cherrypy.expose
     @mimetype('application/json')
-    def available_filters(self):
-        names = [{'name': decode_name(name), 'id': decode_name(name)} for name in self._setstorage.list(NAME_PREFIX)]
+    def index(self, **kwargs):
+        pprint (kwargs)
+        if 'name' in kwargs:
+            regex = kwargs['name']
+            return self.get_filters(regex)
+
+    def get_filters(self, regex):
+        regex = regex.replace('*', '.*')
+        p = re.compile(regex, re.UNICODE)
+        names = []
+        for name in self._setstorage.list(NAME_PREFIX):
+            name = decode_name(name)
+            if p.search(name) is not None:
+                names.append({'name': name, 'id': name})
         return json.dumps(names)
     
     @cherrypy.expose

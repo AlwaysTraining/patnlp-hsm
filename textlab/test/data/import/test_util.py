@@ -1,6 +1,6 @@
 import unittest
 
-from data.importer.util import compute_starts, compute_ends
+from textlab.data.importer.util import compute_starts, compute_ends
 
 
 class ComputeStartsEndsTest(unittest.TestCase):

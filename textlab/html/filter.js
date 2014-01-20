@@ -2,13 +2,30 @@
  * This file is provided for custom JavaScript logic that your HTML files might need.
  * Maqetta includes this JavaScript file by default within HTML pages authored in Maqetta.
  */
+
+require(['dojo/store/JsonRest'], function(JsonRest){
+	filter_name_store = new JsonRest({
+		target: 'filter'
+	});
+});
+
 require(["dojo/ready"], function(ready){
      ready(function(){
          // logic that requires that Dojo is fully initialized should go here
-    	 load_filter_names();
+    	 //load_filter_names();
+         dijit.byId('filter_name').store = filter_name_store;
      });
 });
 
+
+/*
+ * Get the Dojo store associated with filter name input.
+ */
+function filtername_store() {
+	
+}
+
+	
 /*
  * Load filter names into filter name selector.
  */
@@ -252,9 +269,9 @@ function update_graph() {
             .call(drag);
 
         var images = new Array();
-        images[1] = 'img/filter_filter.png';
-        images[2] = 'img/filter_input.png';
-        images[3] = 'img/filter_output.png';
+        images[1] = 'img/filter_filter.svg';
+        images[2] = 'img/filter_input.svg';
+        images[3] = 'img/filter_output.svg';
 
         node.append("image")
             .attr("xlink:href", function(d) { return images[d.group] })
