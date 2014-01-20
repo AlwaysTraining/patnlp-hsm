@@ -7,7 +7,8 @@ from textlab.data.segmentstorage import SegmentStorage
 from textlab.tools.filter import SegmentDocumentMatcher, ContainerFilter, Filter, \
     FILTER_NAME, SEGMENT_NAME, OUTPUT_NAME, CONTAINER_NAME, CONTAINER_INCLUDES, \
     SEGMENT_VALUE_REGEX, CREATES_SEGMENT, SEGMENT_NEG_REGEX, DOCUMENT_PREFIX, \
-    DOCUMENT_REGEX, DOCUMENT_NEG_REGEX, MIXIN_NAME
+    DOCUMENT_REGEX, DOCUMENT_NEG_REGEX, MIXIN_NAME, SPLITTER_REGEX,\
+    SPLITTER_LEFT, SPLITTER_RIGHT, SPLITTER_NEG_REGEX
 
 
 def iterator(iterable):
@@ -230,7 +231,21 @@ class FilterTest(unittest.TestCase):
         segmentstorage = self.segmentstorage()
         segmentstorage.save([self.mixin1()])
         outs = set(filt.filter(segmentstorage, self.documentstorage()))
-        self.assertEqual(set(outs), set(self.first_copy_lemmas()) | set(self.second_copy_lemmas()) | set([self.mixin_copy1()]))
+        self.assertEqual(outs, set(self.first_copy_lemmas()) | set(self.second_copy_lemmas()) | set([self.mixin_copy1()]))
+    
+    def test_splitter(self):
+        kwargs = self.basic_kwargs()
+        kwargs[SPLITTER_LEFT] = u'e'
+        kwargs[SPLITTER_REGEX] = u' '
+        kwargs[SPLITTER_RIGHT] = u'...'
+        kwargs[SPLITTER_NEG_REGEX] = u'was'
+        kwargs[SEGMENT_NAME] = u'sentence'
+        kwargs[OUTPUT_NAME] = u'fragment'
+        filt = Filter(**kwargs)
+        segmentstorage = self.segmentstorage()
+        segmentstorage.save([self.sentence1(), self.sentence2()])
+        outs = set(filt.filter(segmentstorage, self.documentstorage()))
+        self.assertEqual(outs, set(self.fragments()))
     
     def documentA(self):
         return Document(u'DOCUMENT A', u'Dude was sick!')
@@ -289,6 +304,10 @@ class FilterTest(unittest.TestCase):
     
     def sentence2(self):
         return Segment(u'sentence', u'The length is 100', self.documentB(), 0, 17)
+    
+    def fragments(self):
+        return [Segment(u'fragment', u'The', self.documentB(), 0, 3),
+                Segment(u'fragment', u'length is 100', self.documentB(), 4, 17)]
     
     def segmentstorage(self):
         storage = SegmentStorage()

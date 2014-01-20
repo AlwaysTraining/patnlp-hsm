@@ -235,7 +235,7 @@ function apply_filter() {
  */
 function update_graph() {
     var width = 500;
-    var height = 500;
+    var height = 1000;
 
     var force = d3.layout.force()
         .linkDistance(256)
@@ -243,7 +243,7 @@ function update_graph() {
     
     var drag = force.drag().on("dragstart", dragstart);
 
-    dojo.empty('graph_div');
+    dojo.empty('graph_div'); 
     var svg = d3.select('#graph_div').append('svg')
         .attr('width', width)
         .attr('height', height);

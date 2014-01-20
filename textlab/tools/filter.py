@@ -31,6 +31,11 @@ CONTAINER_NEG_REGEX = 'container_neg_regex'
 CONTAINER_INCLUDES = 'container_includes'
 CONTAINER_KEEP_SOURCE = 'container_keep_source'
 
+SPLITTER_LEFT = 'splitter_left'
+SPLITTER_REGEX = 'splitter_regex'
+SPLITTER_RIGHT = 'splitter_right'
+SPLITTER_NEG_REGEX = 'splitter_neg_regex'
+
 MIXIN_NAME = 'mixin_name'
 MIXIN_VALUE_REGEX = 'mixin_value_regex'
 MIXIN_NEG_REGEX = 'mixin_neg_regex'
@@ -41,6 +46,7 @@ class Filter(dict):
                                   SEGMENT_NAME, SEGMENT_VALUE_REGEX, SEGMENT_NEG_REGEX, CREATES_SEGMENT, OUTPUT_NAME,
                                   DOCUMENT_PREFIX, DOCUMENT_REGEX, DOCUMENT_NEG_REGEX,
                                   CONTAINER_NAME, CONTAINER_VALUE_REGEX, CONTAINER_NEG_REGEX, CONTAINER_INCLUDES, CONTAINER_KEEP_SOURCE,
+                                  SPLITTER_LEFT, SPLITTER_REGEX, SPLITTER_RIGHT, SPLITTER_NEG_REGEX,
                                   MIXIN_NAME, MIXIN_VALUE_REGEX, MIXIN_NEG_REGEX])
     MANDATORY_KEYWORDS = frozenset([FILTER_NAME, SEGMENT_NAME, OUTPUT_NAME])
     BOOLEAN_KEYWORDS = frozenset([CREATES_SEGMENT, CONTAINER_INCLUDES, CONTAINER_KEEP_SOURCE])
@@ -68,10 +74,10 @@ class Filter(dict):
     
     def _check_keyword_types(self):
         for key in self:
-            if key in Filter.BOOLEAN_KEYWORDS:
-                assert isinstance(self[key], bool)
-            else:
-                assert isinstance(self[key], unicode)
+            if key in Filter.BOOLEAN_KEYWORDS and not isinstance(self[key], bool):
+                raise AssertionError(key + ' does not have boolean value')
+            elif key not in Filter.BOOLEAN_KEYWORDS and not isinstance(self[key], unicode):
+                raise AssertionError(key + ' does not have unicode value')
     
     def __setitem__(self, key, value):
         super(Filter, self).__setitem__(key, value)
@@ -126,11 +132,34 @@ class Filter(dict):
                                         neg_regex=self.get(CONTAINER_NEG_REGEX, None),
                                         doc_prefix=self.get(DOCUMENT_PREFIX, None))
 
+
     def _mixin_segments(self, segstorage):
         return segstorage.load_iterator(name=self.get(MIXIN_NAME),
                                         value_regex=self.get(MIXIN_VALUE_REGEX, None),
                                         neg_regex=self.get(MIXIN_NEG_REGEX, None),
                                         doc_prefix=self.get(DOCUMENT_PREFIX, None))
+
+    def _split(self, segment, pattern, neg_pattern):
+        if segment.end - segment.start != len(segment.value):
+            raise AssertionError('Splitter requires that the segment value would be same length as referenced document text.')
+        # determine the matching split points
+        split_points = []
+        last_end = None
+        for mo in pattern.finditer(segment.value):
+            if neg_pattern is not None and neg_pattern.search(mo.group(0)) is not None:
+                continue
+            if len(split_points) == 0:
+                split_points.append((0, mo.start('splitter')))
+            else:
+                split_points.append((last_end, mo.start('splitter')))
+            last_end = mo.end('splitter')
+        if last_end is not None:
+            split_points.append((last_end, len(segment.value)))
+        # generate segments
+        for start, end in split_points:
+            if end - start == 0:
+                continue
+            yield Segment(segment.name, segment.value[start:end], None, start, end, segment.doc_name, segment.doc_len)
 
     def filter_basic(self, segstorage, docstorage):
         creates_segment = self.get(CREATES_SEGMENT, False)
@@ -144,18 +173,31 @@ class Filter(dict):
             return ContainerFilter(basic_segments, self._container_segments(segstorage)).get()
         return basic_segments
     
+    def filter_splitter(self, container_segments):
+        if SPLITTER_REGEX in self:
+            regex = self.get(SPLITTER_LEFT, u'') + u'(?P<splitter>' + self.get(SPLITTER_REGEX, u'') + u')' + self.get(SPLITTER_RIGHT, u'')
+            pattern = re.compile(regex, re.UNICODE | re.MULTILINE)
+            neg_pattern = None
+            if SPLITTER_NEG_REGEX in self:
+                neg_pattern = re.compile(self[SPLITTER_NEG_REGEX], re.UNICODE | re.MULTILINE)
+            for cont_seg in container_segments:
+                for seg in self._split(cont_seg, pattern, neg_pattern):
+                    yield seg
+        for seg in container_segments:
+            yield seg
     
-    def filter_mixin(self, container_segments, segstorage):
+    def filter_mixin(self, splitter_segments, segstorage):
         if MIXIN_NAME in self:
             for seg in self._mixin_segments(segstorage):
                 yield seg
-        for seg in container_segments:
+        for seg in splitter_segments:
             yield seg
     
     def filter(self, segstorage, docstorage):
         basic = self.filter_basic(segstorage, docstorage)
         container = self.filter_container(basic, segstorage)
-        mixin = self.filter_mixin(container, segstorage)
+        splitter = self.filter_splitter(container)
+        mixin = self.filter_mixin(splitter, segstorage)
         outname = self[OUTPUT_NAME]
         for seg in mixin:
             seg.name = outname
