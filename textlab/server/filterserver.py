@@ -129,7 +129,7 @@ class FilterServer(object):
         try:
             settings = self._setstorage.load(encode_name(name))
             filt = Filter(**settings)
-            limit = 150
+            limit = 300
             context_size = 50
             
             # preview basic
@@ -140,8 +140,12 @@ class FilterServer(object):
             container_segs = head(filt.filter_container(basic_segs, self._segstorage), limit)
             container = segments_html(container_segs, self._docstorage, context_size)
             
+            # preview splitter
+            splitter_segs = head(filt.filter_splitter(container_segs), limit)
+            splitter = segments_html(splitter_segs, self._docstorage, context_size)
+            
             # preview mixin
-            mixin_segs = head(filt.filter_mixin(container_segs, self._segstorage), limit)
+            mixin_segs = head(filt.filter_mixin(splitter_segs, self._segstorage), limit)
             mixin = segments_html(mixin_segs, self._docstorage, context_size)
             
             # preview final output
@@ -151,6 +155,7 @@ class FilterServer(object):
             data = {'basic': basic,
                     'container': container,
                     'mixin': mixin,
+                    'splitter': splitter,
                     'output': output}
             
             return json.dumps({'result': 'OK', 'data': data})

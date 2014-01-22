@@ -57,7 +57,7 @@ function empty_settings() {
 	settings['splitter_left'] = '';
 	settings['splitter_regex'] = '';
 	settings['splitter_right'] = '';
-	settings['splitter_neg_regex'] = u'';
+	settings['splitter_neg_regex'] = '';
 	
 	settings['mixin_name'] = '';
 	settings['mixin_value_regex'] = '';
@@ -213,6 +213,7 @@ function preview_sample() {
 				dojo.byId('source_html').innerHTML = result['basic'];
 				dojo.byId('container_html').innerHTML = result['container'];
 				dojo.byId('mixin_html').innerHTML = result['mixin'];
+				dojo.byId('splitter_html').innerHTML = result['splitter'];
 				dojo.byId('output_html').innerHTML = result['output'];
 			}
 		}
