@@ -146,16 +146,4 @@ class EtsaDocumentExtractor(object):
                 segments.append(Segment(unicode(morph_key), value, self._document, start, end))
         segmentstorage.save(segments)
 
-if __name__ == '__main__':
-    documentstorage = MongoDocumentStorage()
-    segmentstorage = MongoSegmentStorage()
-    importer = EtsaImporter(host='127.0.0.1',
-                    port=3310,
-                    user='etsad',
-                    passwd='2KHZjJRNwqScpnvh',
-                    db='etsad2',
-                    table_name=u'anamnesis_nlp',
-                    name_prefix=u'etsastat',
-                    documentstorage=documentstorage,
-                    segmentstorage=segmentstorage)
-    importer.import_data()
+
