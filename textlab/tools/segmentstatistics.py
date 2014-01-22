@@ -2,6 +2,7 @@
 Module for providing basic overview of what types of segments
 are available in the system.
 '''
+'''
 import cherrypy
 import matplotlib.pyplot as plt
 import numpy as np
@@ -66,4 +67,4 @@ def barplot(names, values):
     plt.title('Distribution of segment types')
     
     return plot_as_string(plt)
-
+'''
