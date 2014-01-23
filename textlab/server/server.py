@@ -1,6 +1,5 @@
 import cherrypy
 import jinja2
-import json
 import os
 
 from textlab.configuration import config, CONF_FILE_PATH

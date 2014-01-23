@@ -19,13 +19,3 @@ from textlab.configuration import config, CONF_FILE_PATH
 
 application = cherrypy.Application(hsm_root(), script_name=None, config=CONF_FILE_PATH)
 
-def pplication(environ, start_response):
-    status = '200 OK' 
-    output = str(environ) + str(start_response)
-
-    response_headers = [('Content-type', 'text/plain'),
-                        ('Content-Length', str(len(output)))]
-    start_response(status, response_headers)
-
-    return [output]
-

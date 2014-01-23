@@ -15,7 +15,7 @@ from textlab.data.segmentstorage import SegmentStorage
 
 logging.basicConfig()
 
-class EtsaImporter(object):
+class EtsaStatImporter(object):
     '''Importer that uses `anamnesis_nlp` table to retrieve everything necessary.'''
     logger = logging.getLogger('etsaimporter')
     logger.setLevel(logging.DEBUG)
@@ -56,22 +56,66 @@ class EtsaImporter(object):
         if self._conn is not None:
             self._conn.close()
 
-    def import_data(self):
-        '''Import etsa database to given document and segment storage.'''
-        self.logger.info('Importing ETSA data.')
+    def _get_query(self, limit):
+        query = 'select epiId, anamnesis_mrf from ' + self._table_name
+        if limit is not None:
+            query += ' limit ' + str(int(limit))
+        return query
+    
+    def _process_single(self, result):
+        epiId, mrf = result
+        extractor = EtsaDocumentExtractor(self._name_prefix + u':' + unicode(epiId), mrf)
+        extractor.process(self._documentstorage, self._segmentstorage)
+
+    def import_data(self, limit=None):
+        '''Import etsa database to given document and segment storage.
+        Keyword arguments:
+        limit - if not None, then import only `limit` number of first documents.
+        '''
+        self.logger.info('Importing ETSA data. Limit is ' + str(limit))
+        
         cur = self._conn.cursor()
-        cur.execute('select epiId, anamnesis_mrf from ' + self._table_name)
+        cur.execute(self._get_query(limit))
         
         result = cur.fetchone()
         numprocessed = 0
         while result is not None:
-            epiId, mrf = result
-            extractor = EtsaDocumentExtractor(self._name_prefix + u':' + unicode(epiId), mrf)
-            extractor.process(self._documentstorage, self._segmentstorage)
+            self._process_single(result)
             numprocessed += 1
+            if limit is not None and numprocessed >= limit:
+                break
             result = cur.fetchone()
             # TODO: add multithreading
         self.logger.info('Processed {0} documents!'.format(numprocessed))
+
+
+class EtsaAmbImporter(EtsaStatImporter):
+    '''Importer for ambulatory data, which has few variations compared to stationary.'''
+    
+    def __init__(self, *args, **kwargs):
+        EtsaStatImporter.__init__(self, *args, **kwargs)
+    
+    def _get_query(self, limit):
+        query = 'select epiId, anamnesis, anamsum, diagnosis, dcase from ' + self._table_name
+        if limit is not None:
+            query += ' limit ' + str(int(limit))
+        return query
+    
+    def _process_field(self, name, mrf):
+        extractor = EtsaDocumentExtractor(name, mrf)
+        extractor.process(self._documentstorage, self._segmentstorage)
+    
+    def _process_single(self, result):
+        epiId, anamnesis, anamsum, diagnosis, dcase = result
+        if anamnesis is not None:
+            self._process_field(self._name_prefix + u':anamnesis:' + unicode(epiId), anamnesis)
+        if anamsum is not None:
+            self._process_field(self._name_prefix + u':anamsum:' + unicode(epiId), anamsum)
+        if diagnosis is not None:
+            self._process_field(self._name_prefix + u':diagnosis:' + unicode(epiId), diagnosis)
+        if dcase is not None:
+            self._process_field(self._name_prefix + u':dcase:' + unicode(epiId), dcase)
+
 
 class EtsaDocumentExtractor(object):
     '''Class that encapsulates functionality for extracting everything from a single
@@ -139,11 +183,10 @@ class EtsaDocumentExtractor(object):
         all_values = []
         for sentence in self._token_sentences:
             for token in sentence:
-                all_values.append([analyze[morph_key].decode('unicode_escape') for analyze in token.get('analyysid', [])])
+                all_values.append([analyze[morph_key].decode('unicode_escape', errors='replace') for analyze in token.get('analyysid', [])])
         segments = []
         for values, start, end in zip(all_values, self._word_starts, self._word_ends):
             for value in values:
                 segments.append(Segment(unicode(morph_key), value, self._document, start, end))
         segmentstorage.save(segments)
-
 
