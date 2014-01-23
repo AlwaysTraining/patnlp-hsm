@@ -8,7 +8,6 @@ from textlab.data.mongodocumentstorage import MongoDocumentStorage
 from textlab.data.mongosegmentstorage import MongoSegmentStorage
 from textlab.data.mongosettingsstorage import MongoSettingsStorage
 from textlab.server.filterserver import FilterServer
-from textlab.tools.segmentstatistics import SegmentStatistics
 
 
 TEMPLATE_PATH = os.path.join(config.get('/', 'tools.staticdir.root'), 'templates')
@@ -24,9 +23,9 @@ class Server(object):
 
     @cherrypy.expose
     def index(self):
-        return 'It works!'
+        raise cherrypy.HTTPRedirect('index.html')
 
-if __name__ == '__main__':
+def hsm_root():
     segstorage = MongoSegmentStorage()
     docstorage = MongoDocumentStorage()
     setstorage = MongoSettingsStorage()
@@ -34,5 +33,9 @@ if __name__ == '__main__':
     root = Server(segstorage, docstorage)
     root.filter = FilterServer(segstorage, docstorage, setstorage)
 
-    cherrypy.quickstart(root, "/", CONF_FILE_PATH)    
+    return root
+
+if __name__ == '__main__':
+    cherrypy.quickstart(hsm_root(), '', CONF_FILE_PATH)
+
 
