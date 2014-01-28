@@ -180,6 +180,15 @@ class FilterTest(unittest.TestCase):
         copies = set(segmentstorage.load(name=u'lemma:copy'))
         self.assertEqual(copies, set(self.first_copy_lemmas()) | set(self.second_copy_lemmas()))
     
+    def test_second_apply_removes_previous_segments(self):
+        filt = Filter(**self.basic_kwargs())
+        segmentstorage = self.segmentstorage()
+        filt.apply(segmentstorage, self.documentstorage())
+        filt.apply(segmentstorage, self.documentstorage()) # second apply
+        copies = set(segmentstorage.load(name=u'lemma:copy'))
+        self.assertEqual(copies, set(self.first_copy_lemmas()) | set(self.second_copy_lemmas()))
+        
+    
     def test_basic_creation(self):
         kwargs = self.basic_kwargs()
         kwargs[SEGMENT_VALUE_REGEX] = u'was|sick|\d+'

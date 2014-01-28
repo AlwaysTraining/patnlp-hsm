@@ -382,12 +382,12 @@ class NumExtractor(object):
 
     def __init__(self, **kwargs):
         self.extractors = {
-            'record_bloodpressure': BloodPressure(**kwargs),
-            'record_date': Date(**kwargs),
-            'record_measurement': Measurements(**kwargs),
-            'record_medicine': Medicine(**kwargs),
-            'record_timex': Timex(**kwargs),
-            'record_temperature': Temperature(**kwargs)}
+            'record_bloodpressure': BloodPressure(**kwargs)}
+            #'record_date': Date(**kwargs),
+            #'record_measurement': Measurements(**kwargs),
+            #'record_medicine': Medicine(**kwargs),
+            #'record_timex': Timex(**kwargs),
+            #'record_temperature': Temperature(**kwargs)}
 
     def extract(self, document):
         values = dict()
@@ -521,10 +521,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    '''reader = codecs.getreader('utf-8')(sys.stdin)
-    lines = reader.readlines()
-    lines = [(i+1, l) for i, l in enumerate(lines)]
-    import sqlite3
-    conn  = sqlite3.connect("test.sqlite3")
-    create_bp_table(conn, lines)'''
-
