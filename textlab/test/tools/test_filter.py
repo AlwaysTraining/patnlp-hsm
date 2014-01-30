@@ -242,7 +242,7 @@ class FilterTest(unittest.TestCase):
         outs = set(filt.filter(segmentstorage, self.documentstorage()))
         self.assertEqual(outs, set(self.first_copy_lemmas()) | set(self.second_copy_lemmas()) | set([self.mixin_copy1()]))
     
-    def test_splitter(self):
+    def test_splitter_full(self):
         kwargs = self.basic_kwargs()
         kwargs[SPLITTER_LEFT] = u'e'
         kwargs[SPLITTER_REGEX] = u' '
@@ -315,7 +315,8 @@ class FilterTest(unittest.TestCase):
         return Segment(u'sentence', u'The length is 100', self.documentB(), 0, 17)
     
     def fragments(self):
-        return [Segment(u'fragment', u'The', self.documentB(), 0, 3),
+        return [Segment(u'fragment', u'Dude was sick!', self.documentA(), 0, 14),
+                Segment(u'fragment', u'The', self.documentB(), 0, 3),
                 Segment(u'fragment', u'length is 100', self.documentB(), 4, 17)]
     
     def segmentstorage(self):

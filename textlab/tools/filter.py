@@ -155,6 +155,8 @@ class Filter(dict):
             last_end = mo.end('splitter')
         if last_end is not None:
             split_points.append((last_end, len(segment.value)))
+        else:
+            split_points.append((0, len(segment.value)))
         # generate segments
         for start, end in split_points:
             if end - start == 0:
