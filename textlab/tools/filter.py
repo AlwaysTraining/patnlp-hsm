@@ -159,7 +159,9 @@ class Filter(dict):
         for start, end in split_points:
             if end - start == 0:
                 continue
-            yield Segment(segment.name, segment.value[start:end], None, start, end, segment.doc_name, segment.doc_len)
+            offset_start = start + segment.start
+            offset_end = end + segment.start
+            yield Segment(segment.name, segment.value[start:end], None, offset_start, offset_end, segment.doc_name, segment.doc_len)
 
     def filter_basic(self, segstorage, docstorage):
         creates_segment = self.get(CREATES_SEGMENT, False)
