@@ -15,8 +15,9 @@ from textlab.data.segmentstorage import SegmentStorage
 
 logging.basicConfig()
 
-class EtsaStatImporter(object):
-    '''Importer that uses `anamnesis_nlp` table to retrieve everything necessary.'''
+class OldEtsaImporter(object):
+    '''Importer that uses `anamnesis_nlp` table to retrieve everything necessary.
+    This is the oldest variant of the importer.'''
     logger = logging.getLogger('etsaimporter')
     logger.setLevel(logging.DEBUG)
     
@@ -89,11 +90,12 @@ class EtsaStatImporter(object):
         self.logger.info('Processed {0} documents!'.format(numprocessed))
 
 
-class EtsaAmbImporter(EtsaStatImporter):
-    '''Importer for ambulatory data, which has few variations compared to stationary.'''
+class EtsaImporter(OldEtsaImporter):
+    '''Importer for ambulatory data, which has few variations compared to stationary.
+       This is current standard importer.'''
     
     def __init__(self, *args, **kwargs):
-        EtsaStatImporter.__init__(self, *args, **kwargs)
+        OldEtsaImporter.__init__(self, *args, **kwargs)
     
     def _get_query(self, limit):
         query = 'select epiId, anamnesis, anamsum, diagnosis, dcase from ' + self._table_name
@@ -117,6 +119,31 @@ class EtsaAmbImporter(EtsaStatImporter):
             self._process_field(self._name_prefix + u':dcase:' + unicode(epiId), dcase)
 
 
+class EtsaVisitImporter(OldEtsaImporter):
+    '''This is current standard importer for etsa data that is splitted into visits.'''
+    
+    def __init__(self, *args, **kwargs):
+        OldEtsaImporter.__init__(self, *args, **kwargs)
+        
+    def _get_query(self, limit):
+        query = 'select id, epiId, patId, epiType, fieldName, date, json from ' + self._table_name
+        if limit is not None:
+            query += ' limit ' + str(int(limit))
+        return query
+    
+    def _process_single(self, result):
+        rowId, epiId, patId, epiType, fieldName, date, json = result
+        extractor = EtsaDocumentExtractor(self._name_prefix + u':' + unicode(rowId), json)
+        meta = {'id': rowId,
+                'epiId': epiId,
+                'patId': patId,
+                'epiType': epiType,
+                'fieldName': fieldName}
+        if date is not None:
+            meta['date'] = u'{0}-{1}-{2}'.format(date.day, date.month, date.year)
+        extractor.process(self._documentstorage, self._segmentstorage, meta)
+        
+
 class EtsaDocumentExtractor(object):
     '''Class that encapsulates functionality for extracting everything from a single
     ETSA document.'''
@@ -133,12 +160,12 @@ class EtsaDocumentExtractor(object):
         self._plain_sentences = None
         self._document = None
     
-    def process(self, documentstorage, segmentstorage):
+    def process(self, documentstorage, segmentstorage, metadata=None):
         self._create_token_sentences()
         self._create_word_sentences()
         self._create_plain_sentences()
         
-        self._create_document()
+        self._create_document(metadata)
         documentstorage.save(self._document)
         self._create_sentence_segments(segmentstorage)
         self._create_word_segments(segmentstorage)
@@ -148,6 +175,15 @@ class EtsaDocumentExtractor(object):
     def _create_token_sentences(self):
         '''Parses the encoded data from ETSA base into tokens for further processing.'''
         self._token_sentences = ast.literal_eval(self._mrf)
+        self._fix_ne_tokens()
+    
+    def _fix_ne_tokens(self):
+        '''Visits data contains annotated named entities, which are reprsented as empty strings.
+           This method maps them to various placeholders as our segments require length.'''
+        for sentence in self._token_sentences:
+            for word in sentence:
+                if 'ne' in word:
+                    word['sone'] = u'<<' + unicode(word['ne'].upper()) + u'>>'
         
     def _create_word_sentences(self):
         '''Parse the words from tokens.'''
@@ -160,9 +196,10 @@ class EtsaDocumentExtractor(object):
         '''Create plain text sentences.'''
         self._plain_sentences = [u' '.join(sentence) for sentence in self._word_sentences]
     
-    def _create_document(self):
+    def _create_document(self, metadata):
         '''Create a plain text document.'''
         self._document = Document(self._docname, u' '.join(self._plain_sentences))
+        self._document.metadata = metadata
     
     def _create_sentence_segments(self, segmentstorage):
         '''Create segments that denote the sentences in the document and store them.'''
