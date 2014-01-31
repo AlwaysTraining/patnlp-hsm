@@ -11,9 +11,6 @@ from textlab.data.segment import Segment
 from textlab.data.segmentstorage import SegmentStorage
 
 
-class EtsaImporterTest(unittest.TestCase):
-    pass # figure out how to mock the importer properly
-
 class EtsaDocumentExtractorTest(unittest.TestCase):
     '''Test that all segments get extracted from the testing ETSA document.'''
     
