@@ -187,7 +187,7 @@ class EtsaDocumentExtractor(object):
         
     def _create_word_sentences(self):
         '''Parse the words from tokens.'''
-        self._word_sentences = [[token['sone'].decode('unicode_escape') for token in sentence] for sentence in self._token_sentences]
+        self._word_sentences = [[token['sone'].decode('unicode_escape', 'replace') for token in sentence] for sentence in self._token_sentences]
         self._words = reduce(lambda x, y: x + y, self._word_sentences)
         self._word_starts = compute_starts(self._words, u' ')
         self._word_ends = compute_ends(self._words, u' ')
@@ -220,7 +220,7 @@ class EtsaDocumentExtractor(object):
         all_values = []
         for sentence in self._token_sentences:
             for token in sentence:
-                all_values.append([analyze[morph_key].decode('unicode_escape', errors='replace') for analyze in token.get('analyysid', [])])
+                all_values.append([analyze[morph_key].decode('unicode_escape', 'replace') for analyze in token.get('analyysid', [])])
         segments = []
         for values, start, end in zip(all_values, self._word_starts, self._word_ends):
             for value in values:
