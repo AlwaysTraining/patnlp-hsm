@@ -17,9 +17,6 @@ CREATE TABLE IF NOT EXISTS `{SCHEMA}`.`{PREFIX}rr` (
   INDEX `rr_field_idx` (`field` ASC),
   INDEX `rr_epiid_idx` (`epiId` ASC))
 ENGINE = InnoDB;
-
-TRUNCATE TABLE `{SCHEMA}`.`{PREFIX}rr`;
-
 '''
 
 # TODO
@@ -137,3 +134,11 @@ class SqlExtractor(object):
                 self._insert_rr(epiId, field, values)
                 #self._insert_temp(epiId, field, values)
             row = cur.fetchone()
+
+if __name__ == '__main__':
+    extr = SqlExtractor(user='etsad', passwd='', host='127.0.0.1', port=3306, db='etsad2',
+                        prefix='', intable='anamnesis')
+    #extr.process('anamsum')
+    extr.process('anamnesis')
+    extr.process('diagnosis')
+    extr.process('dcase')
