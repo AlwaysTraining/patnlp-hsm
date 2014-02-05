@@ -1,8 +1,10 @@
 '''
 Functionality for extracting numberical values on SQL text fields and store them in
-related databases.'''
+related databases.
+'''
 
 import MySQLdb
+import ast
 from textlab.tools.numextractor import NumExtractor
 
 CREATE_SCRIPT = '''
@@ -135,10 +137,75 @@ class SqlExtractor(object):
                 #self._insert_temp(epiId, field, values)
             row = cur.fetchone()
 
+'''
+CREATE TABLE `bloodpressures_split` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `splitId` bigint(11) NOT NULL,
+  `systolic` int(5) DEFAULT NULL,
+  `diastolic` int(5) DEFAULT NULL,
+  `pulse` int(5) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bloodpressures_split_id_idx` (`splitId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_estonian_ci;
+'''
+
+class SqlVisitExtractor(object):
+    '''Extractor for bloodpressure data in splitted epicrisis.'''
+    
+    def __init__(self, **kwargs):
+        self._user = unicode(kwargs.get('user'))
+        self._passwd = unicode(kwargs.get('passwd', ''))
+        self._host = unicode(kwargs.get('host', '127.0.0.1'))
+        self._port = int(kwargs.get('port', 3306))
+        self._db = unicode(kwargs.get('db'))
+        
+        self._conn = MySQLdb.connect(user=self._user,
+                                     passwd=self._passwd,
+                                     host=self._host,
+                                     port=self._port,
+                                     db=self._db,
+                                     use_unicode=True,
+                                     charset='utf8')
+        self._extractor = NumExtractor()
+
+    def to_plain(self, json):
+        sentences = ast.literal_eval(json)
+        return u' '.join([word['sone'].decode('unicode_escape', 'replace') for sent in sentences for word in sent])
+
+    def _insert_rr(self, splitId, values):
+        tuples = []
+        for entry in values['record_bloodpressure']:
+            systolic, diastolic, pulse = None, None, None
+            if 'systolic' in entry:
+                systolic = entry['systolic']['value']
+            if 'diastolic' in entry:
+                diastolic = entry['diastolic']['value']
+            if 'pulse' in entry:
+                pulse = entry['pulse']['value']
+            tuples.append((splitId, systolic, diastolic, pulse))
+        if len(tuples) > 0:
+            cur = self._conn.cursor()
+            cur.execute('begin')
+            cur.executemany('insert into `' + self._db + '`.`bloodpressures_split` (splitId, systolic, diastolic, pulse) values (%s, %s, %s, %s)', tuples)
+            cur.execute('commit')
+
+    def process(self):
+        sql = 'SELECT id, json from `' + self._db + '`.`anamnesis_split`;'
+        print sql
+        cur = self._conn.cursor()
+        cur.execute(sql)
+        
+        row = cur.fetchone()
+        while row is not None:
+            if row[1] is not None:
+                epiId = long(row[0])
+                values = self._extractor.extract(self.to_plain(row[1]))
+                
+                self._insert_rr(epiId, values)
+                #self._insert_temp(epiId, field, values)
+            row = cur.fetchone()
+
 if __name__ == '__main__':
-    extr = SqlExtractor(user='etsad', passwd='', host='127.0.0.1', port=3306, db='etsad2',
-                        prefix='', intable='anamnesis')
-    #extr.process('anamsum')
-    extr.process('anamnesis')
-    extr.process('diagnosis')
-    extr.process('dcase')
+    extr = SqlVisitExtractor(user='etsad', passwd='', host='127.0.0.1', port=3306, db='work')
+    extr.process()
+ 

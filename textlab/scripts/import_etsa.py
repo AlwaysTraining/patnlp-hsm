@@ -10,7 +10,7 @@ if __name__ == '__main__':
     segstorage = MongoSegmentStorage()
     importer = EtsaVisitImporter(
                     host = u'127.0.0.1',
-                    port = 3310,
+                    port = 3306,
                     user = u'etsad',
                     passwd = u'',
                     db = u'work',
@@ -18,5 +18,5 @@ if __name__ == '__main__':
                     name_prefix = u'etsa',
                     documentstorage = docstorage,
                     segmentstorage = segstorage)
-    importer.import_data(25000)
+    importer.import_data()
 
