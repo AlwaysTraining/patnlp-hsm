@@ -172,7 +172,8 @@ class SqlVisitExtractor(object):
         sentences = ast.literal_eval(json)
         return u' '.join([word['sone'].decode('unicode_escape', 'replace') for sent in sentences for word in sent])
 
-    def _insert_rr(self, splitId, values):
+    def _insert_rr(self, row, values):
+        visitId, epiId, epiTime, patId, epiType, fieldName, date, _ = row
         tuples = []
         for entry in values['record_bloodpressure']:
             systolic, diastolic, pulse = None, None, None
@@ -182,26 +183,24 @@ class SqlVisitExtractor(object):
                 diastolic = entry['diastolic']['value']
             if 'pulse' in entry:
                 pulse = entry['pulse']['value']
-            tuples.append((splitId, systolic, diastolic, pulse))
+            tuples.append((visitId, epiId, epiTime, patId, epiType, fieldName, date, systolic, diastolic, pulse))
         if len(tuples) > 0:
             cur = self._conn.cursor()
             cur.execute('begin')
-            cur.executemany('insert into `' + self._db + '`.`bloodpressures_split` (splitId, systolic, diastolic, pulse) values (%s, %s, %s, %s)', tuples)
+            cur.executemany('insert into `' + self._db + '`.`bloodpressures_visits` (visitID, epiId, epiTime, patId, epiType, fieldName, date, systolic, diastolic, pulse) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', tuples)
             cur.execute('commit')
 
     def process(self):
-        sql = 'SELECT id, json from `' + self._db + '`.`anamnesis_split`;'
+        sql = 'SELECT id, epiId, epiTime, patId, epiType, fieldName, date, json from `' + self._db + '`.`visits`;'
         print sql
         cur = self._conn.cursor()
         cur.execute(sql)
         
         row = cur.fetchone()
         while row is not None:
-            if row[1] is not None:
-                epiId = long(row[0])
-                values = self._extractor.extract(self.to_plain(row[1]))
-                
-                self._insert_rr(epiId, values)
+            if row[7] is not None:
+                values = self._extractor.extract(self.to_plain(row[7]))
+                self._insert_rr(row, values)
                 #self._insert_temp(epiId, field, values)
             row = cur.fetchone()
 
