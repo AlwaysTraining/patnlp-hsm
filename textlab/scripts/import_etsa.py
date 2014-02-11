@@ -14,9 +14,8 @@ if __name__ == '__main__':
                     user = u'etsad',
                     passwd = u'',
                     db = u'work',
-                    table_name = u'anamnesis_split',
+                    table_name = u'events',
                     name_prefix = u'etsa',
                     documentstorage = docstorage,
                     segmentstorage = segstorage)
-    importer.import_data(25000)
-
+    importer.import_data()

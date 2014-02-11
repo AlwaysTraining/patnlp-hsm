@@ -2,6 +2,7 @@
 Module for importing ETSA databases.
 '''
 import MySQLdb
+from MySQLdb.cursors import SSCursor
 import ast
 import logging
 
@@ -75,7 +76,7 @@ class OldEtsaImporter(object):
         '''
         self.logger.info('Importing ETSA data. Limit is ' + str(limit))
         
-        cur = self._conn.cursor()
+        cur = SSCursor(self._conn)
         cur.execute(self._get_query(limit))
         
         result = cur.fetchone()

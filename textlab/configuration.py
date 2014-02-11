@@ -16,9 +16,13 @@ logger.setLevel(logging.DEBUG)
 
 CONF_FILE_PATH = os.path.join(os.path.dirname(textlab.__file__), 'textlab.conf')
 logger.info('Setting default config file path to ' + CONF_FILE_PATH)
-if len(sys.argv) == 2:
-    CONF_FILE_PATH = sys.argv[1]
-    logger.info('Overriding default configuration file path. New path is ' + CONF_FILE_PATH)
+#if len(sys.argv) == 2:
+#    CONF_FILE_PATH = sys.argv[1]
+#    logger.info('Overriding default configuration file path. New path is ' + CONF_FILE_PATH)
+
+PACKAGE_PATH = os.path.dirname(os.path.dirname(textlab.__file__))
+MODELS_PATH = os.path.join(PACKAGE_PATH, 'models')
+DICTIONARY_PATH = os.path.join(MODELS_PATH, 'dictionary')
 
 class StripConfigParser(ConfigParser.RawConfigParser):
     def get(self, section, option):
