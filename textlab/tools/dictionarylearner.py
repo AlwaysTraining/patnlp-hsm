@@ -19,8 +19,7 @@ class DictionaryLearner(object):
             text_document = document.text
             ngrams = self._ngram.transform([text_document])
             self._dictionary.add_documents(ngrams)
-        self._dictionary.filter_extremes()
-        self._dictionary.compactify()
+        #self._dictionary.filter_extremes()
 
     def get(self):
         return self._dictionary
@@ -38,4 +37,5 @@ if __name__ == '__main__':
     dictionary = learner.get()
     path = os.path.join(DICTIONARY_PATH, fname)
     print 'Saving dictionary to <' + path + '>'
-    dictionary.save_as_text(path)
+    dictionary.save(path)
+    dictionary.save_as_text(path + '.txt')

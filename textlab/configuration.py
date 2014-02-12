@@ -23,6 +23,7 @@ logger.info('Setting default config file path to ' + CONF_FILE_PATH)
 PACKAGE_PATH = os.path.dirname(os.path.dirname(textlab.__file__))
 MODELS_PATH = os.path.join(PACKAGE_PATH, 'models')
 DICTIONARY_PATH = os.path.join(MODELS_PATH, 'dictionary')
+LDA_PATH = os.path.join(MODELS_PATH, 'lda')
 
 class StripConfigParser(ConfigParser.RawConfigParser):
     def get(self, section, option):
