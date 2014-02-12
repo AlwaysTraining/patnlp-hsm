@@ -19,9 +19,6 @@ CREATE TABLE IF NOT EXISTS `{SCHEMA}`.`{PREFIX}rr` (
   INDEX `rr_field_idx` (`field` ASC),
   INDEX `rr_epiid_idx` (`epiId` ASC))
 ENGINE = InnoDB;
-
-TRUNCATE TABLE `{SCHEMA}`.`{PREFIX}rr`;
-
 '''
 
 # TODO
@@ -140,7 +137,6 @@ class SqlExtractor(object):
                 #self._insert_temp(epiId, field, values)
             row = cur.fetchone()
 
-
 '''
 CREATE TABLE `bloodpressures_split` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -177,7 +173,7 @@ class SqlVisitExtractor(object):
         return u' '.join([word['sone'].decode('unicode_escape', 'replace') for sent in sentences for word in sent])
 
     def _insert_rr(self, row, values):
-        visitId, epiId, epiTime, patId, epiType, fieldName, date = row
+        visitId, epiId, epiTime, patId, epiType, fieldName, date, _ = row
         tuples = []
         for entry in values['record_bloodpressure']:
             systolic, diastolic, pulse = None, None, None
@@ -191,11 +187,11 @@ class SqlVisitExtractor(object):
         if len(tuples) > 0:
             cur = self._conn.cursor()
             cur.execute('begin')
-            cur.executemany('insert into `' + self._db + '`.`bloodpressures_visit` (visitID, epiId, epiTime, patId, epiType, fieldName, date, systolic, diastolic, pulse) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', tuples)
+            cur.executemany('insert into `' + self._db + '`.`bloodpressures_visits` (visitID, epiId, epiTime, patId, epiType, fieldName, date, systolic, diastolic, pulse) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', tuples)
             cur.execute('commit')
 
     def process(self):
-        sql = 'SELECT id, epiId, epiTime, patId, epiType, fieldName, date, json from `' + self._db + '`.`anamnesis_split`;'
+        sql = 'SELECT id, epiId, epiTime, patId, epiType, fieldName, date, json from `' + self._db + '`.`visits`;'
         print sql
         cur = self._conn.cursor()
         cur.execute(sql)
@@ -207,3 +203,8 @@ class SqlVisitExtractor(object):
                 self._insert_rr(row, values)
                 #self._insert_temp(epiId, field, values)
             row = cur.fetchone()
+
+if __name__ == '__main__':
+    extr = SqlVisitExtractor(user='etsad', passwd='', host='127.0.0.1', port=3306, db='work')
+    extr.process()
+ 
