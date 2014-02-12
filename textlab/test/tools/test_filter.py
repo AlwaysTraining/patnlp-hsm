@@ -8,7 +8,7 @@ from textlab.tools.filter import SegmentDocumentMatcher, ContainerFilter, Filter
     FILTER_NAME, SEGMENT_NAME, OUTPUT_NAME, CONTAINER_NAME, CONTAINER_INCLUDES, \
     SEGMENT_VALUE_REGEX, CREATES_SEGMENT, SEGMENT_NEG_REGEX, DOCUMENT_PREFIX, \
     DOCUMENT_REGEX, DOCUMENT_NEG_REGEX, MIXIN_NAME, SPLITTER_REGEX,\
-    SPLITTER_LEFT, SPLITTER_RIGHT, SPLITTER_NEG_REGEX
+    SPLITTER_LEFT, SPLITTER_RIGHT, SPLITTER_NEG_REGEX, CONTAINER_VALUE_REGEX
 
 
 def iterator(iterable):
@@ -229,9 +229,10 @@ class FilterTest(unittest.TestCase):
     def test_with_container(self):
         kwargs = self.basic_kwargs()
         kwargs[CONTAINER_NAME] = u'sentence'
+        kwargs[CONTAINER_VALUE_REGEX] = u'length'
         filt = Filter(**kwargs)
         outs = set(filt.filter(self.segmentstorage(), self.documentstorage()))
-        self.assertEqual(set(outs), set(self.first_copy_lemmas()) | set(self.second_copy_lemmas()))
+        self.assertEqual(set(outs), set(self.second_copy_lemmas()))
     
     def test_with_mixin(self):
         kwargs = self.basic_kwargs()

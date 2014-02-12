@@ -101,7 +101,8 @@ class Filter(dict):
         iterator = segstorage.load_iterator(name=self.get(SEGMENT_NAME),
                                             value_regex=self.get(SEGMENT_VALUE_REGEX, None),
                                             neg_regex=self.get(SEGMENT_NEG_REGEX, None),
-                                            doc_prefix=self.get(DOCUMENT_PREFIX, None))
+                                            doc_prefix=self.get(DOCUMENT_PREFIX, None),
+                                            sort=True)
         docnames = self._filtered_doc_names(docstorage)
         for segment in iterator:
             if docnames is not None and segment.doc_name not in docnames:

@@ -63,6 +63,13 @@ class SegmentStorage(object):
             del kwargs['limit']
             return limit
     
+    def _parse_sort(self, kwargs):
+        if 'sort' in kwargs:
+            sort = bool(kwargs['sort'])
+            del kwargs['sort']
+            return sort
+        return False
+    
     def load(self, **kwargs):
         '''Load segments from the storage.
         Keyword arguments:
@@ -77,9 +84,12 @@ class SegmentStorage(object):
         return frozenset(self.load_iterator(**kwargs))
     
     def load_iterator(self, **kwargs):
-        '''Same as load, but returns the generator for the returned segments
-           and sorts the segments by document name, segment name, segment start, segment end.'''
+        '''Same as load, but returns the generator for the returned segments.
+        Additional keyword arguments:
+        sort - default False, otherwise sorts the segments by document name, segment name, segment start, segment end.
+        '''
         limit = self._parse_limit(kwargs)
+        sort = self._parse_sort(kwargs)
         name, name_prefix, doc_name, doc_prefix, value_regex, neg_regex = self._parse_arguments(kwargs)
         segments = set()
         if name_prefix is not None:
@@ -96,9 +106,17 @@ class SegmentStorage(object):
         if neg_regex is not None:
             segments = self._filter_neg_regex(segments, neg_regex)
         if doc_prefix is not None:
-            return sorted(self._limit(self._filter_prefix(segments, doc_prefix), limit))
+            generator = self._limit(self._filter_prefix(segments, doc_prefix), limit)
+            if sort:
+                return sorted(generator)
+            else:
+                return generator
         elif doc_name is not None:
-            return sorted(self._limit(self._filter_name(segments, doc_name), limit))
+            generator = self._limit(self._filter_name(segments, doc_name), limit)
+            if sort:
+                return sorted(generator)
+            else:
+                return generator
         else:
             raise Exception('At least `doc_name` or `doc_prefix` should be given!')
     

@@ -57,7 +57,7 @@ class SegmentStorageTest(unittest.TestCase):
         self.assertRaises(Exception, self.storage().load, limit=0)
     
     def test_load_iterator(self):
-        iterator = self.storage().load_iterator(doc_name=self.documentA().name, doc_prefix=u'')
+        iterator = self.storage().load_iterator(doc_name=self.documentA().name, doc_prefix=u'', sort=True)
         expected = self.first_segments() | self.second_segments()
         # test that the iterator does not output full set of segments
         self.assertNotEqual(iter, expected)

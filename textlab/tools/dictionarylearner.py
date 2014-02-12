@@ -13,13 +13,14 @@ class DictionaryLearner(object):
         self._ngram = NgramTransformer(n)
         self._dictionary = Dictionary()
     
-    def fit(self, documentstorage):
+    def fit(self, documentstorage, filter_extremes=True):
         '''Fit a dictonary using documents from given documentstorage.'''
         for document in documentstorage.load_iterator(u''):
             text_document = document.text
             ngrams = self._ngram.transform([text_document])
             self._dictionary.add_documents(ngrams)
-        #self._dictionary.filter_extremes()
+        if filter_extremes:
+            self._dictionary.filter_extremes()
 
     def get(self):
         return self._dictionary

@@ -20,7 +20,7 @@ class EtsaDocumentExtractorTest(unittest.TestCase):
         extractor = EtsaDocumentExtractor(self.doc_name(), open(path, 'r').read())
         self._documentstorage = DocumentStorage()
         self._segmentstorage = SegmentStorage()
-        extractor.process(self._documentstorage, self._segmentstorage)
+        extractor.process(self._documentstorage, self._segmentstorage, {})
     
     def test_document_import(self):
         document = self._documentstorage.load(self.doc_name())

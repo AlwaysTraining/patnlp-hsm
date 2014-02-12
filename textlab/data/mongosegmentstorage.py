@@ -54,6 +54,7 @@ class MongoSegmentStorage(SegmentStorage):
         value_regex - if given, then returns only segments, whose value matches given regular expression.
         neg_regex - if given, discards segments, whose value matches given regular expression.
         limit - if given, limits the number of documents to given limit.
+        sort - default False, otherwise sorts the segments by document name, segment name, segment start, segment end.
         '''
         return frozenset(self.load_iterator(**kwargs))
     
@@ -61,17 +62,18 @@ class MongoSegmentStorage(SegmentStorage):
         '''Same as load, but returns the generator for the returned segments
            and sorts the segments by document name, segment name, segment start, segment end.'''
         limit = self._parse_limit(kwargs)
+        sort = self._parse_sort(kwargs)
         query = self._get_query(kwargs)
-        return self._load_iterator(query, limit)
+        return self._load_iterator(query, limit, sort)
     
-    def _load_iterator(self, query, limit=None):
-        cursor = None
-        criteria = [('doc_name', pm.ASCENDING), ('name', pm.ASCENDING),
+    def _load_iterator(self, query, limit=None, sort=False):
+        cursor = self._segments.find(query)
+        if sort:
+            criteria = [('doc_name', pm.ASCENDING), ('name', pm.ASCENDING),
                          ('start', pm.ASCENDING), ('end', pm.ASCENDING), ('value', pm.ASCENDING)]
-        if limit is None:
-            cursor = self._segments.find(query).sort(criteria)
-        else:
-            cursor = self._segments.find(query).sort(criteria).limit(limit)
+            cursor = cursor.sort(criteria)
+        if limit is not None:
+            cursor = cursor.limit(limit)
         for entry in cursor:
             yield Segment.from_dict(entry)
     
