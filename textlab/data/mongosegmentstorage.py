@@ -24,13 +24,15 @@ class MongoSegmentStorage(SegmentStorage):
         name, name_prefix, doc_name, doc_prefix, value_regex, neg_regex = self._parse_arguments(kwargs)
         query = {}
         if name_prefix is not None:
-            query['name'] = {'$regex': '^' + name_prefix}
+            if len(name_prefix) > 0:
+                query['name'] = {'$regex': '^' + name_prefix}
         elif name is not None:
             query['name'] = name
         else:
             raise Exception('At least `name` or `name_prefix` should be given!')
         if doc_prefix is not None:
-            query['doc_name'] = {'$regex': '^' + doc_prefix}
+            if len(doc_prefix) > 0:
+                query['doc_name'] = {'$regex': '^' + doc_prefix}
         elif doc_name is not None:
             query['doc_name'] = doc_name
         else:
@@ -53,7 +55,7 @@ class MongoSegmentStorage(SegmentStorage):
         doc_prefix - if given, overrides `doc_name` and filters documents by matching their name with the prefix.
         value_regex - if given, then returns only segments, whose value matches given regular expression.
         neg_regex - if given, discards segments, whose value matches given regular expression.
-        limit - if given, limits the number of documents to given limit.
+        limit - if given, limits the number of segments to given limit.
         sort - default False, otherwise sorts the segments by document name, segment name, segment start, segment end.
         '''
         return frozenset(self.load_iterator(**kwargs))
@@ -106,6 +108,9 @@ class MongoSegmentStorage(SegmentStorage):
         counts = self._segments.aggregate([{'$match': query},
                                            {'$group': {'_id': '$name', 'count': {'$sum': 1}}}])
         return self._unpack(counts)
+    
+    def count(self, key):
+        return self._segments.find({'name': key}).count()
     
     def value_counts(self, **kwargs):
         query = self._get_query(kwargs)

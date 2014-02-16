@@ -122,7 +122,7 @@ function load_current_filter() {
 		url: "filter/load",
 		content: {'name': name},
 		load: function(result) {
-			result = JSON.parse(result);
+			var result = JSON.parse(result);
 			if (result['result'] === 'FAIL') {
 				alert(result['error']);
 			} else {
@@ -167,7 +167,7 @@ function save_filter() {
 		url: "filter/save_filter",
 		content: collect_settings(),
 		load: function(result) {
-			result = JSON.parse(result)
+			var result = JSON.parse(result);
 			if (result['result'] === 'FAIL') {
 				alert(result['error']);
 			} else if (result['result'] == 'OK') {
@@ -186,7 +186,7 @@ function remove_current_filter() {
 		url: "filter/remove",
 		content: {'name': name},
 		load: function(result) {
-			result = JSON.parse(result);
+			var result = JSON.parse(result);
 			if (result['result'] === 'FAIL') {
 				alert(result['error']);
 			} else {
@@ -205,7 +205,7 @@ function preview_sample() {
 		url: "filter/preview_sample",
 		content: {'name': name},
 		load: function(result) {
-			result = JSON.parse(result);
+			var result = JSON.parse(result);
 			if (result['result'] === 'FAIL') {
 				alert(result['error']);
 			} else {
@@ -229,7 +229,7 @@ function apply_filter() {
 		url: "filter/apply_filter",
 		content: {'name': name},
 		load: function(result) {
-			result = JSON.parse(result);
+			var result = JSON.parse(result);
 			if (result['result'] === 'FAIL') {
 				alert(result['error']);
 			}

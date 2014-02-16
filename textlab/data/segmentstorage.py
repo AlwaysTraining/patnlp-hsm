@@ -173,6 +173,9 @@ class SegmentStorage(object):
             counts[seg.name] = count + 1
         return counts
     
+    def count(self, key):
+        return self.counts().get(key, 0)
+    
     def value_counts(self, **kwargs):
         '''Get the total number of values.
         Method will return a dictionary: where

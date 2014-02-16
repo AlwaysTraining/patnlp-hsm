@@ -105,6 +105,11 @@ class SegmentStorageTest(unittest.TestCase):
         counts = storage.counts()
         expected = {u'SOME SEGMENT': 3, u'OTHER SEGMENT': 2}
         self.assertEqual(counts, expected)
+        
+    def test_count_single(self):
+        storage = self.storage()
+        count = storage.count(u'OTHER SEGMENT')
+        self.assertEqual(count, 2)
     
     def test_count_docfilter(self):
         storage = self.storage()

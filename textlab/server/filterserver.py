@@ -65,7 +65,9 @@ def head(iterable, n):
         elems.append(elem)
     return elems
 
+
 class FilterServer(object):
+    '''Filter service.'''
     
     def __init__(self, segstorage, docstorage, setstorage):
         self._segstorage = segstorage
@@ -78,9 +80,9 @@ class FilterServer(object):
         pprint (kwargs)
         if 'name' in kwargs:
             regex = kwargs['name']
-            return self.get_filters(regex)
+            return self.get_clusterers(regex)
 
-    def get_filters(self, regex):
+    def get_clusterers(self, regex):
         regex = regex.replace('*', '.*')
         p = re.compile(regex, re.UNICODE)
         names = []
