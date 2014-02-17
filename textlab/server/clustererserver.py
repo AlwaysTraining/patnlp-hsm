@@ -74,7 +74,7 @@ class ClustererServer(object):
 
     @cherrypy.expose
     @mimetype('application/json')
-    def update(self, name, n=500):
+    def update(self, name, n=500, method='FastICA'):
         settings = self._setstorage.load(encode_name(name))
         clusterer = Clusterer(settings)
         
@@ -91,7 +91,8 @@ class ClustererServer(object):
         # prepare args
         kwargs = {'dictionary': dictionary,
                   'ngramtransformer': transformer,
-                  'ldamodel': ldamodel}
+                  'ldamodel': ldamodel,
+                  'method': method}
         Xt = clusterer.fit_transform(documents, **kwargs)
         labels = clusterer.assign_labels(documents)
         data = self._make_data(Xt, labels, documents)

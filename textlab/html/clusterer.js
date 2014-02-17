@@ -101,10 +101,11 @@ function update_preview() {
 	var settings = collect_settings();
 	var n = dijit.byId('preview_sample_size').get('value');
 	var name = settings['clusterer_name'];
+	var method = dijit.byId('dimensionality_reduction').get('value');
 
 	dojo.xhrPost({
 		url: 'clusterer/update',
-		content: {'name': name, 'n': n},
+		content: {'name': name, 'n': n, 'method': method},
 		load: function(result) {
 			var result = JSON.parse(result);
 			if (result['result'] === 'FAIL') {
@@ -187,6 +188,7 @@ function update_svg_preview(data) {
 		  .attr("r", 5)
 		  .attr("cx", function(p) { return xscale(p['x']); })
 		  .attr("cy", function(p) { return yscale(p['y']); })
+		  .attr("label", function(p) { return p['label']; })
 		  .style("fill", function(p) { return color(p['label']); })
 		  .on("click", function(p) {
 			  var label = prompt("Enter label", p['label']);
@@ -277,13 +279,23 @@ function propagate_labels() {
 }
 
 function show_unknown() {
-
+	var svg = d3.select('#plot_svg');
+	var circle = svg.selectAll('circle');
+	circle.style("display", 'block');
 }
 
 function hide_unknown() {
 	var svg = d3.select('#plot_svg');
-	
+	var circle = svg.selectAll('circle');
+	circle.style("display", hider);
 }
 
-
-
+/**
+ * Helper functio to hide 'unknown' datapoints.
+ */
+function hider(datapoint) {
+	if (datapoint['label'] == 'unknown') {
+		return 'none';
+	}
+	return 'block';
+}

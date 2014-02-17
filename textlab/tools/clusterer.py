@@ -4,11 +4,14 @@ Module for clusterer tool.
 from sklearn.manifold import LocallyLinearEmbedding
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.manifold.isomap import Isomap
+from sklearn.decomposition.pca import PCA
+from sklearn.decomposition.fastica_ import FastICA
+from sklearn.lda import LDA
+from sklearn.preprocessing import LabelEncoder
+
 import numpy as np
 import logging
-from sklearn.manifold.isomap import Isomap
-from sklearn.decomposition import pca, nmf
-from sklearn.decomposition.fastica_ import FastICA
 
 CLUSTERER_NAME = 'clusterer_name'
 SEGMENT_NAME = 'segment_name'
@@ -26,7 +29,7 @@ class Clusterer(dict):
         self._check_keywords(kwargs)
         self._dvec = None
         self._scaler = None
-        self._lle = None
+        self._dimreduction = None
     
     def _check_keywords(self, kwargs):
         for key in kwargs:
@@ -39,18 +42,42 @@ class Clusterer(dict):
         if LABEL_DATA in kwargs and not isinstance(kwargs[LABEL_DATA], dict):
             raise ValueError('label data must be a dictionary')
     
+    def _get_method(self, method):
+        if method == 'FastICA':
+            return FastICA(2)
+        elif method == 'PCA':
+            return PCA(2)
+        elif method == 'IsoMap':
+            return Isomap(n_components=2)
+        elif method == 'LLE':
+            return LocallyLinearEmbedding(n_components=2)
+        elif method == 'LDA':
+            return LDA(n_components=2)
+        else:
+            raise ValueError('Invalid method {0} for dimensionality reduction.'.format(method))
+    
     def fit(self, documents, y=None, **kwargs):
         self._dvec = DictVectorizer(dtype=np.float32, sparse=True)
         self._scaler = MinMaxScaler((-1, 1))
-        #self._lle = pca.PCA(whiten=True)
-        self._lle = FastICA(2)
+        #self._dimreduction = pca.PCA(whiten=True)
+        method = kwargs.get('method', 'FastICA')
+        logger.info('Dimensionality reduction method is {0}'.format(method))
+        self._dimreduction = self._get_method(method)
         
         # todo: rewrite using pipeline
         X = self._preprocess(documents, kwargs)
         X = [dict(x) for x in X]
         X = self._dvec.fit_transform(X).todense()
         X = self._scaler.fit_transform(X)
-        X = self._lle.fit_transform(X)
+        if method == 'LDA':
+            y = LabelEncoder().fit_transform(self.assign_labels(documents))
+            # select only documents for LDA that have some meaningful labels
+            idxs = [i for i in range(len(documents)) if y[i] != u'unknown']
+            X = X[idxs, :]
+            y = [yy for yy in y if yy != u'unknown']
+            X = self._dimreduction.fit_transform(X, y)
+        else:
+            X = self._dimreduction.fit_transform(X)
         return self 
     
     def fit_transform(self, documents, y=None, **kwargs):
@@ -61,7 +88,7 @@ class Clusterer(dict):
         X = [dict(x) for x in X]
         X = self._dvec.transform(X).todense()
         X = self._scaler.transform(X)
-        return self._lle.transform(X)
+        return self._dimreduction.transform(X)
     
     def _load_from_kwargs(self, kwargs):
         ngramtransformer = kwargs['ngramtransformer']
