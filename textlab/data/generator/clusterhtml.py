@@ -95,7 +95,7 @@ class ClusterHtml(object):
         
         html = HTML_HEADER
         for idx, label in enumerate(buckets):
-            rows = [u'<p><b>{0} ({1} examples)</b></p>'.format(label, len(buckets[label]) + 1)] + list(sorted(buckets[label]))
+            rows = [u'<p><b>{0} ({1} examples)</b></p>'.format(label, len(buckets[label]))] + list(sorted(buckets[label]))
             html += u'<span class="cluster{0}">{1}</span>'.format(idx, u'\n'.join(rows))
         html += HTML_FOOTER
         

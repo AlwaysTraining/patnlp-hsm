@@ -191,7 +191,7 @@ function update_svg_preview(data) {
 		  .attr("label", function(p) { return p['label']; })
 		  .style("fill", function(p) { return color(p['label']); })
 		  .on("click", function(p) {
-			  var label = prompt("Enter label", p['label']);
+			  var label = prompt("Enter label for " + p['document'], p['label']);
 			  if (label != null) { // if user did not press cancel
 				  plot_data[p['idx']]['label'] = label;
 				  update_svg_preview(plot_data);
