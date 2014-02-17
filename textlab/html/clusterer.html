@@ -30,7 +30,7 @@ require([
 </style>
 <script type="text/javascript" src="clusterer.js"></script>
 </head>
-<body data-maq-flow-layout="true" data-maq-comptype="sketchhifi" class="claro" data-maq-ws="collapse" data-maq-appstates="{}" id="myapp">
+<body data-maq-flow-layout="true" data-maq-comptype="sketchhifi" class="claro" data-maq-ws="collapse" id="myapp" data-maq-appstates="{}">
  <a href="index.html" alt="Index">Index</a>
  <div data-dojo-type="dijit/layout/BorderContainer" design="sidebar" persist="false" gutters="true" style="min-width: 1em; min-height: 1px; z-index: 900; left: 0px; top: 0px; width: 100%; height: 100%;">
    <div data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="left" splitter="true" maxSize="Infinity" doLayout="false" style="width: 396px;">
@@ -94,10 +94,10 @@ require([
            </td>
           </tr>
           <tr>
-            <td colspan="2">
+           <td colspan="2">
              <input type="button" onclick="update_preview()" data-dojo-type="dijit/form/Button" id="update_preview" intermediateChanges="false" label="Update preview" iconClass="dijitNoIcon"></input>
            </td>
-          </tr>
+         </tr>
           <tr>
            <td colspan="2">
             <select data-dojo-type="dijit/form/ComboBox" id="clusterer_name" onchange="load_current_clusterer()" value="" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" invalidMessage="$_unset_$" pageSize="Infinity" searchDelay="200" style="width: 100%;">
@@ -113,10 +113,18 @@ require([
     </div>
   </div>
    <div data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="center" splitter="false" maxSize="Infinity" doLayout="false">
-   	<div id="example_div">
-   	</div>
-   	<div id="plot_div">
-   	</div>
+    <div id="example_div">
+    </div>
+    <div id="plot_div">
+  </div>
+    <div>
+     <input type="button" onclick="update_preview()" data-dojo-type="dijit/form/Button" id="load_latest" intermediateChanges="false" label="Load latest saved labelling" iconClass="dijitNoIcon"></input>
+     <input type="button" onclick="clear_labels()" data-dojo-type="dijit/form/Button" id="clear_labels" intermediateChanges="false" label="Clear labels" iconClass="dijitNoIcon"></input>
+     <input type="button" onclick="save_labels()" data-dojo-type="dijit/form/Button" id="save_labels" intermediateChanges="false" label="Save labels" iconClass="dijitNoIcon"></input>
+     <input type="button" onclick="propagate_labels()" data-dojo-type="dijit/form/Button" id="propagate_labels" intermediateChanges="false" label="Propagate labels" iconClass="dijitNoIcon"></input>
+     <input type="button" onclick="show_unknown()" data-dojo-type="dijit/form/Button" id="show_unknown" intermediateChanges="false" label="Show unknown" iconClass="dijitNoIcon"></input>
+     <input type="button" onclick="hide_unknown()" data-dojo-type="dijit/form/Button" id="hide_unknown" intermediateChanges="false" label="Hide unknown" iconClass="dijitNoIcon"></input>
+   </div>
   </div>
  </div>
 </body>

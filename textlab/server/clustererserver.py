@@ -2,6 +2,8 @@ import cherrypy
 import json
 import re
 import os
+import logging
+import traceback
 
 from pprint import pprint
 from textlab.tools.clusterer import CLUSTERER_NAME, Clusterer, SEGMENT_NAME,\
@@ -12,6 +14,7 @@ from textlab.configuration import DICTIONARY_PATH, LDA_PATH
 from gensim.models.ldamodel import LdaModel
 from textlab.data.transformer.ngramtransformer import NgramTransformer
 
+logger = logging.getLogger('clustererserver')
 NAME_PREFIX = u'clusterertool:'
 
 def encode_name(name):
@@ -90,8 +93,43 @@ class ClustererServer(object):
                   'ngramtransformer': transformer,
                   'ldamodel': ldamodel}
         Xt = clusterer.fit_transform(documents, **kwargs)
-        data = [{'x': e[0][0], 'y': e[0][1], 'document': e[1]} for e in zip(Xt.tolist(), documents)]
+        labels = clusterer.assign_labels(documents)
+        data = self._make_data(Xt, labels, documents)
         return json.dumps({'result': 'OK',
                            'data': data})
+    
+    def _make_data(self, Xt, labels, documents):
+        data = []
+        for idx, e in enumerate(zip(Xt.tolist(), documents, labels)):
+            data.append({'idx': idx, 'x': e[0][0], 'y': e[0][1], 'document': e[1], 'label': e[2]})
+        return data
+    
+    @cherrypy.expose
+    @mimetype('application/json')
+    def save_labels(self, **kwargs):
+        try:
+            pprint(kwargs)
+            name = unicode(kwargs['name'])
+            labels = dict((unicode(key), unicode(value)) for key, value in json.loads(kwargs['labels']).iteritems())
+            
+            settings = self._setstorage.load(encode_name(name))
+            clusterer = Clusterer(settings)
+            clusterer.update_labels(labels)
+            
+            settings = dict(clusterer)
+            self._setstorage.save(encode_name(settings[CLUSTERER_NAME]), settings)
+            return json.dumps({'result': 'OK'})
+        except Exception, e:
+            error = traceback.format_exc()
+            logger.error(error)
+            return json.dumps({'result': 'FAIL', 'error': error})
 
+    @cherrypy.expose
+    @mimetype('application/json')
+    def clear_labels(self, name):
+        settings = self._setstorage.load(encode_name(name))
+        clusterer = Clusterer(settings)
+        clusterer.clear_labels()
+        settings = dict(clusterer)
+        self._setstorage.save(encode_name(settings[CLUSTERER_NAME]), settings)
 

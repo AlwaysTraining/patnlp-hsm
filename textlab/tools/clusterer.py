@@ -14,6 +14,7 @@ CLUSTERER_NAME = 'clusterer_name'
 SEGMENT_NAME = 'segment_name'
 DICTIONARY = 'dictionary'
 LDA_MODEL = 'lda_model'
+LABEL_DATA = 'label_data'
 
 logger = logging.getLogger('clusterertool')
 
@@ -35,6 +36,8 @@ class Clusterer(dict):
                 raise ValueError(u'Keyword {0} value {1} not unicode type'.format(key, kwargs[key]))
             elif len(kwargs[key]) == 0:
                 raise ValueError(u'Keyword {0} value with zero length'.format(key, kwargs[key]))
+        if LABEL_DATA in kwargs and not isinstance(kwargs[LABEL_DATA], dict):
+            raise ValueError('label data must be a dictionary')
     
     def fit(self, documents, y=None, **kwargs):
         self._dvec = DictVectorizer(dtype=np.float32, sparse=True)
@@ -76,3 +79,30 @@ class Clusterer(dict):
         X = ngramtransformer.transform(documents)
         X = [ldamodel[dictionary.doc2bow(x)] for x in X]
         return X
+
+    def assign_labels(self, documents):
+        '''Given a number of documents, return labels if possible. Label u'unknown' is
+        assigned to documents that have no known label.'''
+        label_data = self.get(LABEL_DATA, {})
+        labels = [label_data.get(self._escape_key_for_mongo(d), u'unknown') for d in documents]
+        return labels
+    
+    def update_labels(self, labels):
+        '''Given a dictionary document -> label pairs, update known labels.'''
+        label_data = self.get(LABEL_DATA, {})
+        for document, label in labels.iteritems():
+            document = self._escape_key_for_mongo(document)
+            if not isinstance(document, unicode):
+                raise ValueError(u'Document with content "{0}" not unicode!'.format(document))
+            if not isinstance(label, unicode):
+                raise ValueError(u'Document with content "{0}" does not have unicode label "{1}"!'.format(document, label))
+            label_data[document] = label
+        self[LABEL_DATA] = label_data
+    
+    def _escape_key_for_mongo(self, key):
+        '''Mongo keys must not contain `.` and `$` signs.'''
+        return key.replace('.', '__dot__').replace('$', '__dollar__')
+    
+    def clear_labels(self):
+        self[LABEL_DATA] = {}
+
