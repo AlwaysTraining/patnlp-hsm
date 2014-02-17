@@ -299,3 +299,10 @@ function hider(datapoint) {
 	}
 	return 'block';
 }
+
+function view_examples() {
+	var settings = collect_settings();
+	var n = dijit.byId('preview_sample_size').get('value');
+	var name = settings['clusterer_name'];
+	var load = window.open('/clusterer/view_examples?name=' + name + '&n=' + n, "examples", "scrollbars=1,location=1,status=1");
+}

@@ -13,6 +13,8 @@ from gensim.corpora.dictionary import Dictionary
 from textlab.configuration import DICTIONARY_PATH, LDA_PATH
 from gensim.models.ldamodel import LdaModel
 from textlab.data.transformer.ngramtransformer import NgramTransformer
+from textlab.data.generator import clusterhtml
+from textlab.data.generator.clusterhtml import ClusterHtml
 
 logger = logging.getLogger('clustererserver')
 NAME_PREFIX = u'clusterertool:'
@@ -134,3 +136,14 @@ class ClustererServer(object):
         settings = dict(clusterer)
         self._setstorage.save(encode_name(settings[CLUSTERER_NAME]), settings)
 
+    @cherrypy.expose
+    def view_examples(self, name, n=500):
+        settings = self._setstorage.load(encode_name(name))
+        clusterer = Clusterer(settings)
+        
+        # get the input
+        segments = self._segstorage.load(name=settings[SEGMENT_NAME], limit=int(n))
+        documents = [s.value for s in segments]
+        
+        labels = clusterer.assign_labels(documents)
+        return ClusterHtml.html(documents, labels)
