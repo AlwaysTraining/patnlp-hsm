@@ -37,10 +37,12 @@ function empty_settings() {
  */
 function load_current_clusterer() {
 	var name = dijit.byId('clusterer_name').get('value');
+	show_loader();
 	dojo.xhrGet({
 		url: "clusterer/load",
 		content: {'name': name},
 		load: function(result) {
+			hide_loader();
 			result = JSON.parse(result);
 			if (result['result'] === 'FAIL') {
 				alert(result['error']);
@@ -103,10 +105,12 @@ function update_preview() {
 	var name = settings['clusterer_name'];
 	var method = dijit.byId('dimensionality_reduction').get('value');
 
+	show_loader();
 	dojo.xhrPost({
 		url: 'clusterer/update',
 		content: {'name': name, 'n': n, 'method': method},
 		load: function(result) {
+			hide_loader();
 			var result = JSON.parse(result);
 			if (result['result'] === 'FAIL') {
 				alert(result['error']);
@@ -114,7 +118,6 @@ function update_preview() {
 				var data = result['data'];
 				plot_data = data
 				update_svg_preview(data);
-				alert('Updated!');
 			}
 		}
 	});
@@ -306,3 +309,12 @@ function view_examples() {
 	var name = settings['clusterer_name'];
 	var load = window.open('/clusterer/view_examples?name=' + name + '&n=' + n, "examples", "scrollbars=1,location=1,status=1");
 }
+
+function show_loader() {
+	dojo.style(dojo.byId('ajaxloader'), 'display', 'block');
+}
+
+function hide_loader() {
+	dojo.style(dojo.byId('ajaxloader'), 'display', 'none');
+}
+

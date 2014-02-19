@@ -30,6 +30,7 @@ class Clusterer(dict):
         self._dvec = None
         self._scaler = None
         self._dimreduction = None
+        self._labelenc = None
     
     def _check_keywords(self, kwargs):
         for key in kwargs:
@@ -70,7 +71,8 @@ class Clusterer(dict):
         X = self._dvec.fit_transform(X).todense()
         X = self._scaler.fit_transform(X)
         if method == 'LDA':
-            y = LabelEncoder().fit_transform(self.assign_labels(documents))
+            self._labelenc = LabelEncoder().fit(self.assign_labels(documents))
+            y = self._labelenc.transform(self.assign_labels(documents))
             # select only documents for LDA that have some meaningful labels
             idxs = [i for i in range(len(documents)) if y[i] != u'unknown']
             X = X[idxs, :]
@@ -90,6 +92,24 @@ class Clusterer(dict):
         X = self._scaler.transform(X)
         return self._dimreduction.transform(X)
     
+    def predict(self, documents, **kwargs):
+        if kwargs.get('method', 'FastICA') != 'LDA':
+            raise ValueError('Choose LSA method for prediction!')
+        X = self._preprocess(documents, kwargs)
+        X = [dict(x) for x in X]
+        X = self._dvec.transform(X).todense()
+        X = self._scaler.transform(X)
+        return self._labelenc.inverse_transform(self._dimreduction.predict(X))
+    
+    def predict_proba(self, documents, **kwargs):
+        if kwargs.get('method', 'FastICA') != 'LDA':
+            raise ValueError('Choose LSA method for prediction!')
+        X = self._preprocess(documents, kwargs)
+        X = [dict(x) for x in X]
+        X = self._dvec.transform(X).todense()
+        X = self._scaler.transform(X)
+        pass
+    
     def _load_from_kwargs(self, kwargs):
         ngramtransformer = kwargs['ngramtransformer']
         dictionary = kwargs['dictionary']
@@ -106,6 +126,15 @@ class Clusterer(dict):
         X = ngramtransformer.transform(documents)
         X = [ldamodel[dictionary.doc2bow(x)] for x in X]
         return X
+    
+    def get_training_data(self):
+        '''Return the existing training data for the classifier.'''
+        labeldata = self.get(LABEL_DATA, {})
+        docs, labels = [], []
+        for doc in labeldata:
+            docs.append(self._descape_key_from_mongo(doc))
+            labels.append(labeldata[doc])
+        return docs, labels
 
     def assign_labels(self, documents):
         '''Given a number of documents, return labels if possible. Label u'unknown' is
@@ -130,6 +159,8 @@ class Clusterer(dict):
         '''Mongo keys must not contain `.` and `$` signs.'''
         return key.replace('.', '__dot__').replace('$', '__dollar__')
     
+    def _descape_key_from_mongo(self, key):
+        return key.replace('__dot__', '.').replace('__dollar__', '$')
+    
     def clear_labels(self):
         self[LABEL_DATA] = {}
-

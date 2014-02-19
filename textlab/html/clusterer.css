@@ -32,3 +32,15 @@ div.tooltip {
   border-radius: 8px;           
   pointer-events: none;
 }
+
+#ajaxloader {
+	position:absolute;
+	display:none;
+	width:20em;
+	padding:0.5em;
+	left:500px;
+	top:250px;
+	z-index:9999999;
+	text-align:center;
+	background-color:rgb(240, 240, 240);
+}
