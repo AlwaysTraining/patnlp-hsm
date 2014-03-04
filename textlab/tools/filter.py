@@ -96,13 +96,13 @@ class Filter(dict):
         if DOCUMENT_REGEX in self or DOCUMENT_NEG_REGEX in self:
             return frozenset([doc.name for doc in self._doc_iterator(docstorage)])
     
-    def _basic_segment_iterator(self, segstorage, docstorage):
+    def _basic_segment_iterator(self, segstorage, docstorage, sort=False):
         '''Method that loads the baseic segments of the filter.'''
         iterator = segstorage.load_iterator(name=self.get(SEGMENT_NAME),
                                             value_regex=self.get(SEGMENT_VALUE_REGEX, None),
                                             neg_regex=self.get(SEGMENT_NEG_REGEX, None),
                                             doc_prefix=self.get(DOCUMENT_PREFIX, None),
-                                            sort=True)
+                                            sort=sort)
         docnames = self._filtered_doc_names(docstorage)
         for segment in iterator:
             if docnames is not None and segment.doc_name not in docnames:
@@ -171,7 +171,10 @@ class Filter(dict):
         if creates_segment:
             return self._basic_segmentcreator_iterator(docstorage)
         else:
-            return self._basic_segment_iterator(segstorage, docstorage)
+            sort = False
+            if CONTAINER_NAME in self:
+                sort = True
+            return self._basic_segment_iterator(segstorage, docstorage, sort)
 
     def filter_container(self, basic_segments, segstorage):
         if CONTAINER_NAME in self:

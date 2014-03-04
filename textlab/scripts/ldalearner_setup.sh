@@ -11,3 +11,5 @@ python -m gensim.models.lda_dispatcher &
 # set up workers
 python -m gensim.models.lda_worker &
 python -m gensim.models.lda_worker &
+
+# now run ldalearner.py
