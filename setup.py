@@ -8,5 +8,5 @@ setup(name='Textlab',
       author='Timo Petmanson',
       author_email='timo.petmanson@ut.ee',
       url='http://www.stacc.ee',
-      packages=['textlab', 'test'],
+      packages=['hsm', 'test'],
      )
