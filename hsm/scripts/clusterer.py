@@ -4,10 +4,12 @@ a model with some annotated labels for training.
 '''
 
 import argparse
+from gensim.corpora.dictionary import Dictionary
+from gensim.models.ldamodel import LdaModel
 import logging
 import os
+from pprint import pprint
 
-from hsm import Dictionary, LdaModel, pprint
 from hsm.configuration import DICTIONARY_PATH, LDA_PATH
 from hsm.data.mongodocumentstorage import MongoDocumentStorage
 from hsm.data.mongosegmentstorage import MongoSegmentStorage
@@ -20,13 +22,13 @@ from hsm.tools.clusterer import DICTIONARY, LDA_MODEL, SEGMENT_NAME, Clusterer
 logger = logging.getLogger('clusterer script')
 
 def load_next_n(iterator, n=500):
-    documents = []
+    segments = []
     for i in range(n):
         try:
-            documents.append(iterator.next().value)
+            segments.append(iterator.next())
         except StopIteration:
             break
-    return documents
+    return segments
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Cluster segments')
@@ -59,9 +61,10 @@ if __name__ == '__main__':
     
     logger.info(u'Classifying segments with name {0}'.format(settings[SEGMENT_NAME]))
     iter = segstorage.load_iterator(name=settings[SEGMENT_NAME])
-    texts = load_next_n(iter)
+    segments = load_next_n(iter)
     while len(texts) > 0:
+        texts = [s.value for s in segments]
+        docnames = [s.doc_name for s in segments]
         labels = clusterer.predict(texts, **kwargs)
-        pprint(zip(texts, labels))
-        texts = load_next_n(iter)
-
+        pprint(zip(texts, docnames, labels))
+        segments = load_next_n(iter)
