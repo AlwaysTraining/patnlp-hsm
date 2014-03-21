@@ -12,7 +12,7 @@ if __name__ == '__main__':
                     host = u'127.0.0.1',
                     port = 3306,
                     user = u'etsad',
-                    passwd = u'',
+                    passwd = u'2KHZjJRNwqScpnvh',
                     db = u'work',
                     table_name = u'events',
                     name_prefix = u'etsa',
