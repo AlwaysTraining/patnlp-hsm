@@ -53,15 +53,15 @@ if __name__ == '__main__':
     
     logger.info('Fitting clusterer')
     clusterer = Clusterer(settings)
-    docs, labels = clusterer.get_training_data()
-    clusterer.fit(docs, labels, **kwargs)
+    texts, labels = clusterer.get_training_data()
+    clusterer.fit(texts, labels, **kwargs)
     logger.info('Fitting completed!')
     
     logger.info(u'Classifying segments with name {0}'.format(settings[SEGMENT_NAME]))
     iter = segstorage.load_iterator(name=settings[SEGMENT_NAME])
-    docs = load_next_n(iter)
-    while len(docs) > 0:
-        labels = clusterer.predict(docs, **kwargs)
-        pprint(zip(docs, labels))
-        docs = load_next_n(iter)
+    texts = load_next_n(iter)
+    while len(texts) > 0:
+        labels = clusterer.predict(texts, **kwargs)
+        pprint(zip(texts, labels))
+        texts = load_next_n(iter)
 

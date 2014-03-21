@@ -31,16 +31,16 @@ class DocumentStorageTest(unittest.TestCase):
         self.assertRaises(Exception, self.storage().load_all, u'', 0)
     
     def test_load_regex(self):
-        docs = set(self.storage().load_all(u'', regex=u'where'))
-        self.assertEqual(docs, set([self.documentB(), self.documentC()]))
+        texts = set(self.storage().load_all(u'', regex=u'where'))
+        self.assertEqual(texts, set([self.documentB(), self.documentC()]))
     
     def test_load_neg_regex(self):
-        docs = set(self.storage().load_all(u'', neg_regex=u'where'))
-        self.assertEqual(docs, set([self.documentA()]))
+        texts = set(self.storage().load_all(u'', neg_regex=u'where'))
+        self.assertEqual(texts, set([self.documentA()]))
     
     def test_load_both_regex(self):
-        docs = set(self.storage().load_all(u'', regex=u'where', neg_regex=u'Mexico'))
-        self.assertEqual(docs, set([self.documentC()]))
+        texts = set(self.storage().load_all(u'', regex=u'where', neg_regex=u'Mexico'))
+        self.assertEqual(texts, set([self.documentC()]))
     
     def test_load_iterator(self):
         iterator = self.storage().load_iterator(u'')

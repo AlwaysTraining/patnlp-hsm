@@ -130,11 +130,11 @@ class Clusterer(dict):
     def get_training_data(self):
         '''Return the existing training data for the classifier.'''
         labeldata = self.get(LABEL_DATA, {})
-        docs, labels = [], []
+        texts, labels = [], []
         for doc in labeldata:
-            docs.append(self._descape_key_from_mongo(doc))
+            texts.append(self._descape_key_from_mongo(doc))
             labels.append(labeldata[doc])
-        return docs, labels
+        return texts, labels
 
     def assign_labels(self, documents):
         '''Given a number of documents, return labels if possible. Label u'unknown' is

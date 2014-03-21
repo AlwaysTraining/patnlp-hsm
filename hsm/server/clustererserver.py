@@ -1,15 +1,18 @@
 import cherrypy
+from gensim.corpora.dictionary import Dictionary
+from gensim.models.ldamodel import LdaModel
 import json
 import logging
 import os
+from pprint import pprint
 import re
 import traceback
 
-from hsm import Dictionary, LdaModel, mimetype, pprint
 from hsm.configuration import DICTIONARY_PATH, LDA_PATH
 from hsm.data.generator import clusterhtml
 from hsm.data.generator.clusterhtml import ClusterHtml
 from hsm.data.transformer.ngramtransformer import NgramTransformer
+from hsm.server.util import mimetype
 from hsm.tools.clusterer import CLUSTERER_NAME, Clusterer, SEGMENT_NAME, \
     DICTIONARY, LDA_MODEL
 

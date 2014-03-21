@@ -40,9 +40,9 @@ class MongoSegmentStorage(SegmentStorage):
             raise Exception('At least `doc_name` or `doc_prefix` should be given!')
         regex_query = {}
         if value_regex is not None:
-            regex_query['$regex'] = re.compile(value_regex, re.UNICODE)
+            regex_query['$regex'] = re.compile(value_regex)
         if neg_regex is not None:
-            regex_query['$not'] = re.compile(neg_regex, re.UNICODE)
+            regex_query['$not'] = re.compile(neg_regex)
         if value_regex is not None or neg_regex is not None:
             query['value'] = regex_query
         return query

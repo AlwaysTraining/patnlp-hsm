@@ -2,9 +2,10 @@
 
 import cherrypy
 import json
+from pprint import pprint
 import re
 
-from hsm import mimetype, pprint
+from hsm.server.util import mimetype
 from hsm.tools.filter import Filter, FILTER_NAME
 
 
@@ -131,8 +132,8 @@ class FilterServer(object):
         try:
             settings = self._setstorage.load(encode_name(name))
             filt = Filter(**settings)
-            limit = 300
-            context_size = 50
+            limit = 100
+            context_size = 60
             
             # preview basic
             basic_segs = head(filt.filter_basic(self._segstorage, self._docstorage), limit)
