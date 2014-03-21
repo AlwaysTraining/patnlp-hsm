@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <title>Clusterer</title>
+        <script type="text/javascript" src="lib/d3.min.js"></script>
+        <script type="text/javascript" src="lib/dojo/dojo/dojo.js" data-dojo-config="'parseOnLoad':true,'async':true,'packages':[{'name':'gridx','location':'../gridx'},{'name':'clipart','location':'../../clipart'},{'name':'maqettaSamples','location':'../../../samples'},{'name':'maqetta','location':'../../maqetta'},{'name':'shapes','location':'../../shapes'},{'name':'zazl','location':'../../zazl'},{'name':'widgets','location':'../../custom'}],'themeMap':[['Android','',['themes/android/android.css']],['BlackBerry','',['themes/blackberry/blackberry.css']],['iPad','',['themes/ipad/ipad.css']],['iPhone','',['themes/iphone/iphone.css']],['.*','',['themes/iphone/iphone.css']]],'mblThemeFiles':[],'mblLoadCompatPattern':''"></script>
+        <script type="text/javascript">
+            require([
+              "dijit/dijit",
+              "dojo/parser",
+              "maqetta/space",
+              "maqetta/AppStates",
+              "shapes/Circle",
+              "dojox/mobile",
+              "dojox/mobile/deviceTheme",
+              "dojox/mobile/FixedSplitter",
+              "dojox/mobile/Pane",
+              "dijit/layout/BorderContainer",
+              "dijit/layout/ContentPane",
+              "dojox/mobile/Accordion",
+              "dojox/mobile/ContentPane",
+              "dijit/form/TextBox",
+              "dijit/form/ComboBox",
+              "dijit/form/Button",
+            ]);
+        </script>
+        <style>@import "themes/claro/document.css";@import "themes/claro/claro.css";@import "clusterer.css";</style>
+        <script type="text/javascript" src="clusterer.js"></script>
+    </head>
+    <body data-maq-flow-layout="true" data-maq-comptype="sketchhifi" class="claro" data-maq-ws="collapse" id="myapp" data-maq-appstates="{}">
+        <a href="index.html" alt="Index">Index</a>
+        <div id="ajaxloader">please wait while computer is thinking</div>
+        <div data-dojo-type="dijit/layout/BorderContainer" design="sidebar" persist="false" gutters="true" style="min-width: 1em; min-height: 1px; z-index: 900; left: 0px; top: 0px; width: 100%; height: 100%;">
+            <div data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="left" splitter="true" maxSize="Infinity" doLayout="false" style="width: 396px;">
+                <div style="width: 100%; height: 100%; font-size: 10pt;">
+                    <table style="border-collapse:collapse;table-layout:auto;width:100%;height:auto;" border="0">
+                        <colgroup>
+                            <col>
+                            </col>
+                            <col>
+                            </col>
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    Segment name:
+                                </td>
+                                <td>
+                                    <select data-dojo-type="dijit/form/ComboBox" id="segment_name" value="fragment" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" invalidMessage="$_unset_$" pageSize="Infinity" searchDelay="200" style="width: 100%;">
+                                        <option value="fragment">
+                                            fragment
+                                        </option>
+                                        <option value="sentence">
+                                            sentence
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Preview sample size:
+                                </td>
+                                <td>
+                                    <select data-dojo-type="dijit/form/ComboBox" id="preview_sample_size" value="50" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" invalidMessage="$_unset_$" pageSize="Infinity" searchDelay="200" style="width: 100%;">
+                                        <option value="50">
+                                            50
+                                        </option>
+                                        <option value="100">
+                                            100
+                                        </option>
+                                        <option value="250">
+                                            250
+                                        </option>
+                                        <option value="500">
+                                            500
+                                        </option>
+                                        <option value="1000">
+                                            1000
+                                        </option>
+                                        <option value="5000">
+                                            5000
+                                        </option>
+                                        <option value="10000">
+                                            10000
+                                        </option>
+                                        <option value="25000">
+                                            25000
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Dictionary:
+                                </td>
+                                <td>
+                                    <select data-dojo-type="dijit/form/ComboBox" id="dictionary" value="" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" invalidMessage="$_unset_$" pageSize="Infinity" searchDelay="200" style="width: 100%;">
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    LDA model:
+                                </td>
+                                <td>
+                                    <select data-dojo-type="dijit/form/ComboBox" id="lda_model" value="fragment10000" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" invalidMessage="$_unset_$" pageSize="Infinity" searchDelay="200" style="width: 100%;">
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Dim. reduction:</td>
+                                <td>
+                                    <select data-dojo-type="dijit/form/ComboBox" id="dimensionality_reduction" value="FastICA" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" invalidMessage="$_unset_$" pageSize="Infinity" searchDelay="200" style="width: 100%;">
+                                        <option value="ica">
+                                            FastICA
+                                        </option>
+                                        <option value="pca">
+                                            PCA
+                                        </option>
+                                        <option value="lle">
+                                            LLE
+                                        </option>
+                                        <option value="isomap">
+                                            IsoMap
+                                        </option>
+                                        <option value="lda">
+                                            LDA
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <input type="button" onclick="update_preview()" data-dojo-type="dijit/form/Button" id="update_preview" intermediateChanges="false" label="Update preview" iconClass="dijitNoIcon"></input>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <select data-dojo-type="dijit/form/ComboBox" id="clusterer_name" onchange="load_current_clusterer()" value="" intermediateChanges="false" trim="false" uppercase="false" lowercase="false" propercase="false" invalidMessage="$_unset_$" pageSize="Infinity" searchDelay="200" style="width: 100%;">
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div>
+                        <input type="button" onclick="load_clusterer(empty_settings())" data-dojo-type="dijit/form/Button" id="new_model" intermediateChanges="false" label="New model" iconClass="dijitNoIcon"></input>
+                        <input type="button" onclick="save_clusterer()" data-dojo-type="dijit/form/Button" id="save_model" intermediateChanges="false" label="Save model" iconClass="dijitNoIcon"></input>
+                    </div>
+                </div>
+            </div>
+            <div data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="center" splitter="false" maxSize="Infinity" doLayout="false">
+                <div id="example_div">
+                </div>
+                <div id="plot_div">
+                </div>
+                <div>
+                    <input type="button" onclick="update_preview()" data-dojo-type="dijit/form/Button" id="load_latest" intermediateChanges="false" label="Load latest saved labelling" iconClass="dijitNoIcon"></input>
+                    <input type="button" onclick="clear_labels()" data-dojo-type="dijit/form/Button" id="clear_labels" intermediateChanges="false" label="Clear labels" iconClass="dijitNoIcon"></input>
+                    <input type="button" onclick="save_labels()" data-dojo-type="dijit/form/Button" id="save_labels" intermediateChanges="false" label="Save labels" iconClass="dijitNoIcon"></input>
+                    <input type="button" onclick="propagate_labels()" data-dojo-type="dijit/form/Button" id="propagate_labels" intermediateChanges="false" label="Propagate labels" iconClass="dijitNoIcon"></input>
+                    <input type="button" onclick="show_unknown()" data-dojo-type="dijit/form/Button" id="show_unknown" intermediateChanges="false" label="Show unknown" iconClass="dijitNoIcon"></input>
+                    <input type="button" onclick="hide_unknown()" data-dojo-type="dijit/form/Button" id="hide_unknown" intermediateChanges="false" label="Hide unknown" iconClass="dijitNoIcon"></input>
+                    <input type="button" onclick="view_examples()" data-dojo-type="dijit/form/Button" id="view_examples" intermediateChanges="false" label="View examples" iconClass="dijitNoIcon"></input>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
