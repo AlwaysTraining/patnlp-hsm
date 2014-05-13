@@ -22,7 +22,7 @@ if __name__ == '__main__':
                     host = u'127.0.0.1',
                     port = port,
                     user = u'etsad',
-                    passwd = args[0],
+                    passwd = passwd,
                     db = u'work',
                     table_name = u'events',
                     name_prefix = u'etsa',
