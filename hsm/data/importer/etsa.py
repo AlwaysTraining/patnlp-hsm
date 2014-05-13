@@ -1,7 +1,7 @@
 '''
 Module for importing ETSA databases.
 '''
-from MySQLdb.cursors import SSCursor
+from MySQLdb.cursors import SSCursor, DictCursor
 import MySQLdb
 import ast
 import logging
@@ -70,12 +70,17 @@ class OldEtsaImporter(object):
         extractor = EtsaDocumentExtractor(self._name_prefix + u':' + unicode(epiId), mrf)
         extractor.process(self._documentstorage, self._segmentstorage)
 
+    def _pre_import_data_hook(self):
+        pass
+
     def import_data(self, limit=None):
         '''Import etsa database to given document and segment storage.
         Keyword arguments:
         limit - if not None, then import only `limit` number of first documents.
         '''
         self.logger.info('Importing ETSA data. Limit is ' + str(limit))
+        
+        self._pre_import_data_hook()
         
         cur = SSCursor(self._conn)
         cur.execute(self._get_query(limit))
@@ -104,7 +109,7 @@ class EtsaImporter(OldEtsaImporter):
         if limit is not None:
             query += ' limit ' + str(int(limit))
         return query
-    
+        
     def _process_field(self, name, mrf):
         extractor = EtsaDocumentExtractor(name, mrf)
         extractor.process(self._documentstorage, self._segmentstorage)
@@ -133,16 +138,31 @@ class EtsaVisitImporter(OldEtsaImporter):
             query += ' limit ' + str(int(limit))
         return query
     
+    def _pre_import_data_hook(self):
+        self.logger.info('Retrieving procedures metadata')
+        cursor = DictCursor(self._conn)
+        cursor.execute('select epiId, unifiedDisplayName from work.procedure_entries;')
+        self._procedures_data = cursor.fetchall()
+        self.logger.info('Retrieving procedures metadata done.')
+    
     def _process_single(self, result):
         rowId, epiId, patId, epiType, fieldName, date, json = result
-        extractor = EtsaDocumentExtractor(self._name_prefix + u':' + unicode(rowId), json)
+        extractor = EtsaDocumentExtractor(self._name_prefix + u':' + fieldName + u':' + unicode(rowId), json)
         meta = {'id': rowId,
                 'epiId': epiId,
                 'patId': patId,
                 'epiType': epiType,
                 'fieldName': fieldName}
+        # handle date
         if date is not None:
             meta['date'] = u'{0}-{1}-{2}'.format(date.day, date.month, date.year)
+        # handle procedures metadata
+        if fieldName == 'procedures_text':
+            procmeta = self._procedures_data[0]
+            if procmeta['epiId'] != epiId:
+                raise Exception('EpiIds do not match for event {0} and next procedure metadata with epiId {1}'.format(epiId, procmeta['epiId']))
+            meta['procedure'] = procmeta['unifiedDisplayName']
+            self._procedures_data = self._procedures_data[1:]
         extractor.process(self._documentstorage, self._segmentstorage, meta)
         
 
@@ -170,9 +190,9 @@ class EtsaDocumentExtractor(object):
         self._create_document(metadata)
         documentstorage.save(self._document)
         self._create_sentence_segments(segmentstorage)
-        self._create_word_segments(segmentstorage)
-        self._create_morph_segments(segmentstorage, 'lemma')
-        self._create_morph_segments(segmentstorage, 'pos')
+        #self._create_word_segments(segmentstorage)
+        #self._create_morph_segments(segmentstorage, 'lemma')
+        #self._create_morph_segments(segmentstorage, 'pos')
 
     def _create_token_sentences(self):
         '''Parses the encoded data from ETSA base into tokens for further processing.'''

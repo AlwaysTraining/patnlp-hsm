@@ -213,7 +213,7 @@ class Filter(dict):
     
     def apply(self, segstorage, docstorage):
         segstorage.delete(name=self[OUTPUT_NAME])
-        batch_size = 1000
+        batch_size = 100
         segs = []
         for seg in self.filter(segstorage, docstorage):
             segs.append(seg)

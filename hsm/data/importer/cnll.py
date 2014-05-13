@@ -1,9 +1,10 @@
 '''Module for importing cnll files.'''
 
 import codecs
+from copy import deepcopy
+from itertools import izip
 import logging
 
-from hsm import deepcopy, izip
 from hsm.data.document import Document
 from hsm.data.importer.util import compute_starts, compute_ends
 from hsm.data.mongodocumentstorage import MongoDocumentStorage

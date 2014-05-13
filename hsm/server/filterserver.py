@@ -132,7 +132,7 @@ class FilterServer(object):
         try:
             settings = self._setstorage.load(encode_name(name))
             filt = Filter(**settings)
-            limit = 100
+            limit = 300
             context_size = 60
             
             # preview basic
