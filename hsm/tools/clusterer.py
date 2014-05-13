@@ -58,7 +58,7 @@ class Clusterer(dict):
             raise ValueError('Invalid method {0} for dimensionality reduction.'.format(method))
     
     def fit(self, documents, y=None, **kwargs):
-        self._dvec = DictVectorizer(dtype=np.float32, sparse=True)
+        self._dvec = DictVectorizer(dtype=np.float32, sparse=False)
         self._scaler = MinMaxScaler((-1, 1))
         #self._dimreduction = pca.PCA(whiten=True)
         method = kwargs.get('method', 'FastICA')
@@ -68,7 +68,7 @@ class Clusterer(dict):
         # todo: rewrite using pipeline
         X = self._preprocess(documents, kwargs)
         X = [dict(x) for x in X]
-        X = self._dvec.fit_transform(X).todense()
+        X = self._dvec.fit_transform(X)
         X = self._scaler.fit_transform(X)
         if method == 'LDA':
             self._labelenc = LabelEncoder().fit(self.assign_labels(documents))
@@ -88,27 +88,30 @@ class Clusterer(dict):
     def transform(self, documents, **kwargs):
         X = self._preprocess(documents, kwargs)
         X = [dict(x) for x in X]
-        X = self._dvec.transform(X).todense()
+        X = self._dvec.transform(X)
         X = self._scaler.transform(X)
         return self._dimreduction.transform(X)
     
-    def predict(self, documents, **kwargs):
+    def _pre_predict(self, documents, **kwargs):
         if kwargs.get('method', 'FastICA') != 'LDA':
             raise ValueError('Choose LSA method for prediction!')
         X = self._preprocess(documents, kwargs)
         X = [dict(x) for x in X]
-        X = self._dvec.transform(X).todense()
+        X = self._dvec.transform(X)
         X = self._scaler.transform(X)
+        return X
+    
+    def predict(self, documents, **kwargs):
+        X = self._pre_predict(documents, **kwargs)
         return self._labelenc.inverse_transform(self._dimreduction.predict(X))
     
     def predict_proba(self, documents, **kwargs):
-        if kwargs.get('method', 'FastICA') != 'LDA':
-            raise ValueError('Choose LSA method for prediction!')
-        X = self._preprocess(documents, kwargs)
-        X = [dict(x) for x in X]
-        X = self._dvec.transform(X).todense()
-        X = self._scaler.transform(X)
-        pass
+        X = self._pre_predict(documents, **kwargs)
+        return self._dimreduction.predict_log_proba(X)
+    
+    def score(self, documents, labels, **kwargs):
+        X = self._pre_predict(documents, **kwargs)
+        return self._dimreduction.score(X, self._labelenc.transform(labels))
     
     def _load_from_kwargs(self, kwargs):
         ngramtransformer = kwargs['ngramtransformer']

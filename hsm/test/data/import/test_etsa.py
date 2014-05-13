@@ -29,7 +29,8 @@ class EtsaDocumentExtractorTest(unittest.TestCase):
         segments = self._segmentstorage.load(doc_name=self.doc_name(), name=u'sentence')
         self.assertEqual(segments, self.sentence_segments())
     
-    def test_word_segment_import(self):
+    # commend these in when you comment in importing words, lemmas and pos tags. currently disabled for performance reasons.
+    '''def test_word_segment_import(self):
         segments = self._segmentstorage.load(doc_name=self.doc_name(), name=u'word')
         self.assertEqual(segments, self.word_segments())
     
@@ -39,7 +40,7 @@ class EtsaDocumentExtractorTest(unittest.TestCase):
     
     def test_pos_segment_import(self):
         segments = self._segmentstorage.load(doc_name=self.doc_name(), name=u'pos')
-        self.assertEqual(segments, self.pos_segments())
+        self.assertEqual(segments, self.pos_segments())'''
 
     def doc_name(self):
         return u'testdoc'

@@ -24,24 +24,29 @@ class CsvExporter(object):
         self._outfile = outfile
         self._writer = None
     
-    def export(self, segments, labels):
+    def export(self, segments, labels, scores):
         '''Export function can be called consequently many times.
         The first call to the function writes the header of the CSV file, which
         includes everything also in the document metadata.'''
-        for seg, lab in izip(segments, labels):
+        assert len(segments) == len(labels)
+        assert len(labels) == len(scores)
+        
+        for seg, lab, score in izip(segments, labels, scores):
             doc = self._docstorage.load(seg.doc_name)
             data = dict(doc.metadata.items() +
                     {'content': doc.text[seg.start:seg.end].encode('utf-8'),
                     'value': lab,
+                    'confidence': score,
                     'name': self._name,
                     'left_ctxt': doc.text[max(0, seg.start-self._ctxt_radius):seg.start].encode('utf-8'),
                     'right_ctxt': doc.text[seg.end:min(seg.end+self._ctxt_radius, len(doc.text))].encode('utf-8')}.items())
             if self._writer == None:
-                keynames = ['name', 'value', 'left_ctxt', 'content', 'right_ctxt'] + list(doc.metadata.keys())
+                keynames = ['name', 'value', 'confidence', 'left_ctxt', 'content', 'right_ctxt'] + list(doc.metadata.keys())
                 self._writer = csv.DictWriter(self._outfile, keynames)
                 self._writer.writeheader()
             self._writer.writerow(data)
     
-    def finalize(self):
-        pass
+    def close(self):
+        self._outfile.close()
+
     

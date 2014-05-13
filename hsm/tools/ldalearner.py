@@ -1,8 +1,8 @@
-from hsm import Dictionary
-from hsm import LdaModel
-import hsm
-import hsm
-import hsm
+from gensim.corpora.dictionary import Dictionary
+from gensim.models.ldamodel import LdaModel
+import logging
+import os
+import sys
 
 from hsm.configuration import DICTIONARY_PATH, LDA_PATH
 from hsm.data.mongosegmentstorage import MongoSegmentStorage
