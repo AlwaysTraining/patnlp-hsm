@@ -87,29 +87,31 @@ class Filter(dict):
         super(Filter, self).update(*args, **kwargs)
         self._check_everything()
     
-    def _doc_iterator(self, docstorage):
+    def _doc_iterator(self, docstorage, limit=None):
         return docstorage.load_iterator(self.get(DOCUMENT_PREFIX, u''),
+                                        limit=limit,
                                         regex=self.get(DOCUMENT_REGEX, None),
                                         neg_regex=self.get(DOCUMENT_NEG_REGEX, None))
         
-    def _filtered_doc_names(self, docstorage):
+    def _filtered_doc_names(self, docstorage, limit):
         if DOCUMENT_REGEX in self or DOCUMENT_NEG_REGEX in self:
-            return frozenset([doc.name for doc in self._doc_iterator(docstorage)])
+            return frozenset([doc.name for doc in self._doc_iterator(docstorage, limit)])
     
-    def _basic_segment_iterator(self, segstorage, docstorage, sort=False):
+    def _basic_segment_iterator(self, segstorage, docstorage, sort=False, limit=None):
         '''Method that loads the baseic segments of the filter.'''
         iterator = segstorage.load_iterator(name=self.get(SEGMENT_NAME),
                                             value_regex=self.get(SEGMENT_VALUE_REGEX, None),
                                             neg_regex=self.get(SEGMENT_NEG_REGEX, None),
                                             doc_prefix=self.get(DOCUMENT_PREFIX, None),
-                                            sort=sort)
+                                            sort=sort,
+                                            limit=limit)
         docnames = self._filtered_doc_names(docstorage)
         for segment in iterator:
             if docnames is not None and segment.doc_name not in docnames:
                 continue
             yield segment
     
-    def _basic_segmentcreator_iterator(self, docstorage):
+    def _basic_segmentcreator_iterator(self, docstorage, limit=None):
         '''Method that creates basic segments from raw documents.'''
         # compile value and negative regexes as necessary
         value_regex = re.compile(self[SEGMENT_VALUE_REGEX], re.UNICODE)
@@ -118,7 +120,7 @@ class Filter(dict):
             neg_regex = re.compile(self[SEGMENT_NEG_REGEX], re.UNICODE)
         # iterate all matching documents to find matching segments
         seg_name = self[SEGMENT_NAME]
-        for doc in self._doc_iterator(docstorage):
+        for doc in self._doc_iterator(docstorage, limit):
             text = doc.text
             for mo in value_regex.finditer(text):
                 value = mo.group(0)
@@ -166,15 +168,15 @@ class Filter(dict):
             offset_end = end + segment.start
             yield Segment(segment.name, segment.value[start:end], None, offset_start, offset_end, segment.doc_name, segment.doc_len)
 
-    def filter_basic(self, segstorage, docstorage):
+    def filter_basic(self, segstorage, docstorage, limit=None):
         creates_segment = self.get(CREATES_SEGMENT, False)
         if creates_segment:
-            return self._basic_segmentcreator_iterator(docstorage)
+            return self._basic_segmentcreator_iterator(docstorage, limit=limit)
         else:
             sort = False
             if CONTAINER_NAME in self:
                 sort = True
-            return self._basic_segment_iterator(segstorage, docstorage, sort)
+            return self._basic_segment_iterator(segstorage, docstorage, sort, limit=limit)
 
     def filter_container(self, basic_segments, segstorage):
         if CONTAINER_NAME in self:

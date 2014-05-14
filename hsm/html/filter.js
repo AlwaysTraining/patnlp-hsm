@@ -201,11 +201,13 @@ function remove_current_filter() {
  */
 function preview_sample() {
 	var name = dijit.byId('filter_name').get('value');
+	show_loader();
 	dojo.xhrGet({
 		url: "filter/preview_sample",
 		content: {'name': name},
 		load: function(result) {
 			var result = JSON.parse(result);
+			hide_loader();
 			if (result['result'] === 'FAIL') {
 				alert(result['error']);
 			} else {
@@ -321,3 +323,10 @@ function dragstart(d) {
   d3.select(this).classed("fixed", d.fixed = true);
 }
 
+function show_loader() {
+	dojo.style(dojo.byId('ajaxloader'), 'display', 'block');
+}
+
+function hide_loader() {
+	dojo.style(dojo.byId('ajaxloader'), 'display', 'none');
+}
