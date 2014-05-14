@@ -226,7 +226,7 @@ class EtsaDocumentExtractor(object):
     
     def _create_document(self, metadata):
         '''Create a plain text document.'''
-        self._document = Document(self._docname, u' '.join(self._plain_sentences))
+        self._document = Document(self._docname, u'\n'.join(self._plain_sentences))
         self._document.metadata = metadata
     
     def _create_sentence_segments(self, segmentstorage):

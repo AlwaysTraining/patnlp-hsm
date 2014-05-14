@@ -56,7 +56,8 @@ def segments_html(segs, docstorage, context_size=30):
     htmls = [emphasize_html(seg, docstorage, context_size) for seg in segs]
     htmls.sort(key=lambda (left, middle, right): (middle, left[:-5:-1]))
     htmls = [left + u'<b>' + middle + '</b>' + right for left, middle, right in htmls]
-    return u'<br/>'.join(htmls)
+    htmls = [html.replace('\n', '<br/>') for html in htmls]
+    return u'<hr/>'.join(htmls)
 
 def head(iterable, n):
     elems = []
@@ -133,10 +134,11 @@ class FilterServer(object):
             settings = self._setstorage.load(encode_name(name))
             filt = Filter(**settings)
             limit = 300
+            query_limit=10000
             context_size = 60
             
             # preview basic
-            basic_segs = head(filt.filter_basic(self._segstorage, self._docstorage), limit)
+            basic_segs = head(filt.filter_basic(self._segstorage, self._docstorage, limit=query_limit), limit)
             basic = segments_html(basic_segs, self._docstorage, context_size)
             
             # preview container
