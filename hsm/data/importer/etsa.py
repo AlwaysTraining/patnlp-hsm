@@ -133,21 +133,13 @@ class EtsaVisitImporter(OldEtsaImporter):
         OldEtsaImporter.__init__(self, *args, **kwargs)
         
     def _get_query(self, limit):
-        query = 'select id, epiId, patId, epiType, fieldName, date, json from ' + self._table_name + ' where fieldName="procedures_text" order by epiId, date'
+        query = 'select id, epiId, patId, epiType, fieldName, date, json from ' + self._table_name
         if limit is not None:
             query += ' limit ' + str(int(limit))
         return query
     
     def _pre_import_data_hook(self):
-        self.logger.info('Retrieving procedures metadata')
-        cursor = DictCursor(self._conn)
-        cursor.execute('select epiId, unifiedDisplayName from work.procedure_entries order by epiId;')
-        self._procedures_data = {}
-        for row in cursor.fetchall():
-            names = self._procedures_data.get(row['epiId'], [])
-            names.append(row['unifiedDisplayName'])
-            self._procedures_data[row['epiId']] = names
-        self.logger.info('Retrieving procedures metadata done.')
+        pass
     
     def _process_single(self, result):
         rowId, epiId, patId, epiType, fieldName, date, json = result
@@ -160,15 +152,6 @@ class EtsaVisitImporter(OldEtsaImporter):
         # handle date
         if date is not None:
             meta['date'] = u'{0}-{1}-{2}'.format(date.day, date.month, date.year)
-        # handle procedures metadata
-        #if fieldName == 'procedures_text':
-        #    if epiId in self._procedures_data:
-        #        names = self._procedures_data[epiId]
-        #        meta['procedure'] = names[0].decode('latin-1')
-        #        print 'Adding', names[0].decode('latin-1')
-        #        names = names[1:]
-        #        self._procedures_data = names
-        #    print 'skipping'
         extractor.process(self._documentstorage, self._segmentstorage, meta)
         
 
